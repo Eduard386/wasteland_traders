@@ -102,7 +102,7 @@ export const useGameStore = create<GameState>()(
 
         // Начальный инвентарь - 2 случайных товара
         const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
-        const initialInv: Record<GoodId, number> = {};
+        const initialInv: Partial<Record<GoodId, number>> = {};
         const invRng = createRNG(gameSeed, 0, 'inventory');
         
         for (let i = 0; i < 2; i++) {
@@ -135,7 +135,7 @@ export const useGameStore = create<GameState>()(
         
         // Выбираем 2 случайных города для обновления
         const cityIds = world.cities.map(c => c.id);
-        const selectedCities = [];
+        const selectedCities: string[] = [];
         
         for (let i = 0; i < 2; i++) {
           const available = cityIds.filter(id => !selectedCities.includes(id));
@@ -172,7 +172,7 @@ export const useGameStore = create<GameState>()(
         const prices = getAllPrices(currentCity.market);
         
         // Проверяем лимит ≤3 единиц одного товара
-        for (const [good, count] of Object.entries(take)) {
+        for (const [, count] of Object.entries(take)) {
           if (count > 3) return false;
         }
 
@@ -200,7 +200,7 @@ export const useGameStore = create<GameState>()(
       },
 
       // Путешествие
-      travel: (toCityId: string, useGuard: boolean) => {
+      travel: (toCityId: string, _useGuard: boolean) => {
         const { world, player } = get();
         const road = world.roads.find(r => 
           (r.from === player.cityId && r.to === toCityId) ||

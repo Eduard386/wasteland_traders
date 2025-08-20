@@ -15,9 +15,9 @@ const CityScreen = () => {
     return `/assets/cities/${cityId}.png`;
   };
 
-  const getGoodImage = (goodId: string) => {
-    return `/assets/goods/${goodId}.png`;
-  };
+  // const getGoodImage = (goodId: string) => {
+  //   return `/assets/goods/${goodId}.png`;
+  // };
 
   if (!currentCity || !currentCityState || !prices) {
     return <div>Loading...</div>;
