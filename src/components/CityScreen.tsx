@@ -12,7 +12,7 @@ const CityScreen = () => {
   const prices = currentCityState ? getAllPrices(currentCityState.market) : null;
 
   const getCityImage = (cityId: string) => {
-    return `/assets/cities/${cityId}.png`;
+    return `./assets/cities/${cityId}.png`;
   };
 
   // const getGoodImage = (goodId: string) => {
