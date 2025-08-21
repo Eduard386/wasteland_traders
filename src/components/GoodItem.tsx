@@ -47,10 +47,10 @@ const GoodItem: React.FC<GoodItemProps> = ({
         src={getGoodImage(goodId)} 
         alt={getGoodName(goodId)}
         className="good-image"
-        onError={(e) => {
-          console.error(`Failed to load image for ${goodId}`);
-          e.currentTarget.style.display = 'none';
-        }}
+                            onError={(e) => {
+                      // console.error(`Failed to load image for ${goodId}`);
+                      e.currentTarget.style.display = 'none';
+                    }}
       />
       <div className="good-info">
         <div className="good-name">{getGoodName(goodId)}</div>

@@ -23,16 +23,16 @@ const CityScreen = () => {
     return <div>Loading...</div>;
   }
 
-  console.log('Current city:', currentCity.id, 'Image path:', getCityImage(currentCity.id));
+  // console.log('Current city:', currentCity.id, 'Image path:', getCityImage(currentCity.id));
   
   // Проверяем загрузку изображения
   const img = new Image();
-  img.onload = () => console.log('Image loaded successfully:', getCityImage(currentCity.id));
-  img.onerror = () => console.log('Image failed to load:', getCityImage(currentCity.id));
+  img.onload = () => {/* console.log('Image loaded successfully:', getCityImage(currentCity.id)) */};
+  img.onerror = () => {/* console.log('Image failed to load:', getCityImage(currentCity.id)) */};
   img.src = getCityImage(currentCity.id);
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLDivElement, Event>) => {
-    console.log('Image failed to load:', e);
+  const handleImageError = () => {
+    // console.log('Image failed to load');
   };
 
 

@@ -41,11 +41,11 @@ const BarterScreen = () => {
 
   const handleTrade = () => {
     if (executeTrade(giveItems, takeItems)) {
-      console.log('Trade successful!', { giveItems, takeItems });
+      // console.log('Trade successful!', { giveItems, takeItems });
       setGiveItems({} as Record<GoodId, number>);
       setTakeItems({} as Record<GoodId, number>);
     } else {
-      alert('Invalid trade! Check the rules.');
+      // alert('Invalid trade! Check the rules.');
     }
   };
 

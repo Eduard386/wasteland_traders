@@ -33,6 +33,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Check code quality
+      run: npm run check
+      
+    - name: Build
+      run: npm run build
+      
     - name: Build
       run: npm run build
       

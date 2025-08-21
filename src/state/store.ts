@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { World, Player, CityState, CityMarket, MarketMode, GoodId } from '../lib/types';
 import { createWorldGraph } from '../lib/graph';
-import { createRNG } from '../lib/random';
+import { createRNG, type SeededRNG } from '../lib/random';
 import { getAllPrices } from '../lib/values';
 
 interface GameState {
@@ -29,7 +29,7 @@ const MARKET_WEIGHTS: Record<MarketMode, number> = {
 };
 
 // Генерация случайного режима рынка
-function generateMarketMode(rng: any): CityMarket {
+function generateMarketMode(rng: SeededRNG): CityMarket {
   const modes: MarketMode[] = Object.keys(MARKET_WEIGHTS) as MarketMode[];
   const weights = modes.map(mode => MARKET_WEIGHTS[mode]);
   
@@ -55,11 +55,12 @@ function generateMarketMode(rng: any): CityMarket {
             mode, 
             exp: [rng.choice(['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'] as GoodId[])]
           };
-        case 'CHEAP_EXP':
+        case 'CHEAP_EXP': {
           const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
           const cheap = rng.choice(goods);
           const exp = rng.choice(goods.filter(g => g !== cheap));
           return { mode, cheap: [cheap], exp: [exp] };
+        }
       }
     }
   }
@@ -126,7 +127,7 @@ export const useGameStore = create<GameState>()(
           currentScreen: 'city'
         });
         
-        console.log('Game initialized with cities:', cities.map(c => ({ id: c.id, name: c.name })));
+        // console.log('Game initialized with cities:', cities.map(c => ({ id: c.id, name: c.name })));
       },
 
       // Тик рынков
@@ -233,7 +234,7 @@ export const useGameStore = create<GameState>()(
       },
 
       // Путешествие
-      travel: (toCityId: string, _useGuard: boolean) => {
+      travel: (toCityId: string) => {
         const { world, player } = get();
         const road = world.roads.find(r => 
           (r.from === player.cityId && r.to === toCityId) ||
