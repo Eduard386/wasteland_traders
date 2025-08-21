@@ -65,7 +65,7 @@ const MapScreen = () => {
 
   return (
     <div className="map-screen">
-      <div 
+      <div
         className="map-background"
         style={{ backgroundImage: `url(${getWorldMap()})` }}
       >
