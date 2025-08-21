@@ -1,0 +1,102 @@
+.bankruptcy-screen {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f8f9fa;
+    z-index: 1000;
+    background-image: url('/assets/bankrupt.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bankruptcy-content {
+    text-align: center;
+    max-width: 800px;
+    padding: 60px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+    border: 3px solid #e74c3c;
+    box-shadow: 0 0 50px rgba(231, 76, 60, 0.6);
+    backdrop-filter: blur(10px);
+}
+
+.bankruptcy-image {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+}
+
+.bankruptcy-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 50px;
+    color: #ffffff;
+    text-shadow:
+        0 0 10px rgba(231, 76, 60, 0.8),
+        0 0 20px rgba(231, 76, 60, 0.6),
+        0 0 30px rgba(231, 76, 60, 0.4),
+        2px 2px 4px rgba(0, 0, 0, 0.9);
+    line-height: 1.2;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
+}
+
+.new-game-btn {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.new-game-btn:hover {
+    background: linear-gradient(45deg, #c0392b, #a93226);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.new-game-btn:active {
+    transform: translateY(0);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .bankruptcy-content {
+        padding: 30px;
+        margin: 20px;
+        max-width: 90%;
+    }
+
+    .bankruptcy-title {
+        font-size: 2rem;
+        margin-bottom: 40px;
+        letter-spacing: 1px;
+    }
+
+    .new-game-btn {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+}

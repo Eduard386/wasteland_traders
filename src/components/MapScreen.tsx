@@ -8,6 +8,11 @@ const MapScreen = () => {
   const { world, player, setScreen, travel } = useGameStore();
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
 
+  // Проверяем наличие ресурсов для действий
+  const hasWater = (player.inv['water'] || 0) > 0;
+  const hasFood = (player.inv['food'] || 0) > 0;
+  const hasResources = hasWater || hasFood;
+
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const neighbors = currentCity
     ? world.cities.filter(c => currentCity.neighbors.includes(c.id))
@@ -146,17 +151,17 @@ const MapScreen = () => {
               Return to City
             </button>
             <button
-              className="btn guard-btn"
-              disabled={!selectedCityId}
+              className={`btn guard-btn ${!hasResources ? 'disabled' : ''}`}
+              disabled={!selectedCityId || !hasResources}
             >
               Hire Guards
             </button>
             <button
-              className="btn travel-btn"
-              disabled={!selectedCityId}
+              className={`btn travel-btn ${!hasResources ? 'disabled' : ''}`}
+              disabled={!selectedCityId || !hasResources}
               onClick={handleTravel}
             >
-              Travel without guards
+              Travel (1 water or 1 food)
             </button>
           </div>
         </div>

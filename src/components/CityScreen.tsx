@@ -211,6 +211,11 @@ const CityScreen = () => {
   const takeValue = calculateValue(takeItems);
   const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0;
 
+  // Проверяем наличие ресурсов для действий
+  const hasWater = (player.inv['water'] || 0) > 0;
+  const hasFood = (player.inv['food'] || 0) > 0;
+  const hasResources = hasWater || hasFood;
+
   return (
     <div className="city-screen">
       {/* Фон города */}
@@ -231,8 +236,12 @@ const CityScreen = () => {
               >
                 Map
               </button>
-              <button className="btn action-btn" onClick={doTick}>
-                Make Market Tick (2 cities)
+              <button
+                className={`btn action-btn ${!hasResources ? 'disabled' : ''}`}
+                onClick={doTick}
+                disabled={!hasResources}
+              >
+                Next Day (1 water or 1 food)
               </button>
               <button className="btn action-btn">
                 Copy Game Link

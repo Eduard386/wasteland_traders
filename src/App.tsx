@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import { useGameStore } from './state/store';
 import CityScreen from './components/CityScreen';
 import MapScreen from './components/MapScreen';
+import BankruptcyScreen from './components/BankruptcyScreen';
 import './App.css';
 
 function App() {
-  const { world, initializeGame, currentScreen } = useGameStore();
+  const { world, initializeGame, currentScreen, isBankrupt } = useGameStore();
 
   // Инициализация игры при первом запуске
   useEffect(() => {
@@ -13,6 +14,11 @@ function App() {
       initializeGame();
     }
   }, [world.cities.length, initializeGame]);
+
+  // Проверяем банкротство
+  if (isBankrupt()) {
+    return <BankruptcyScreen />;
+  }
 
   // Рендер соответствующего экрана
   const renderScreen = () => {

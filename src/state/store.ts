@@ -12,10 +12,13 @@ interface GameState {
   currentScreen: 'city' | 'map';
 
   // Экшены
-  doTick: () => void;
+  canSpendResource: () => boolean;
+  spendResource: () => Partial<Record<GoodId, number>> | false;
+  isBankrupt: () => boolean;
+  doTick: () => boolean;
   proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
-  travel: (toCityId: string) => void;
+  travel: (toCityId: string) => boolean;
   setScreen: (screen: 'city' | 'map') => void;
   initializeGame: (seed?: number) => void;
 }
@@ -102,13 +105,18 @@ export const useGameStore = create<GameState>()(
           };
         });
 
-        // Начальный инвентарь - 2 случайных товара
-        const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
+        // Начальный инвентарь - 1 вода, 1 еда, и 2 случайных товара
         const initialInv: Partial<Record<GoodId, number>> = {};
         const invRng = createRNG(gameSeed, 0, 'inventory');
 
+        // Гарантированно добавляем 1 воду и 1 еду
+        initialInv['water'] = 1;
+        initialInv['food'] = 1;
+
+        // Добавляем 2 случайных товара (исключая воду и еду)
+        const remainingGoods: GoodId[] = ['fuel', 'ammo', 'scrap', 'medicine'];
         for (let i = 0; i < 2; i++) {
-          const good = invRng.choice(goods);
+          const good = invRng.choice(remainingGoods);
           initialInv[good] = (initialInv[good] || 0) + invRng.int(1, 4);
         }
 
@@ -135,9 +143,65 @@ export const useGameStore = create<GameState>()(
         // console.log('Game initialized with cities:', cities.map(c => ({ id: c.id, name: c.name })));
       },
 
+      // Функция для проверки наличия ресурсов
+      canSpendResource: () => {
+        const { player } = get();
+        const waterCount = player.inv['water'] || 0;
+        const foodCount = player.inv['food'] || 0;
+        return waterCount > 0 || foodCount > 0;
+      },
+
+      // Функция для проверки банкротства
+      isBankrupt: () => {
+        const { player } = get();
+        const inv = player.inv;
+        // Проверяем, есть ли хоть что-то в инвентаре
+        return Object.keys(inv).length === 0 || Object.values(inv).every(count => count <= 0);
+      },
+
+      // Функция для траты ресурсов (вода или еда)
+      spendResource: () => {
+        const { player, world } = get();
+        const newInv = { ...player.inv };
+        const waterCount = newInv['water'] || 0;
+        const foodCount = newInv['food'] || 0;
+
+        if (waterCount > 0 && foodCount > 0) {
+          // Если есть и вода и еда - тратим случайную
+          const rng = createRNG(world.seed, world.tick, 'resource');
+          if (rng.next() < 0.5) {
+            newInv['water'] = waterCount - 1;
+            if (newInv['water'] <= 0) delete newInv['water'];
+          } else {
+            newInv['food'] = foodCount - 1;
+            if (newInv['food'] <= 0) delete newInv['food'];
+          }
+        } else if (waterCount > 0) {
+          // Если есть только вода - тратим воду
+          newInv['water'] = waterCount - 1;
+          if (newInv['water'] <= 0) delete newInv['water'];
+        } else if (foodCount > 0) {
+          // Если есть только еда - тратим еду
+          newInv['food'] = foodCount - 1;
+          if (newInv['food'] <= 0) delete newInv['food'];
+        } else {
+          // Если нет ни воды ни еды - возвращаем false
+          return false;
+        }
+
+        return newInv;
+      },
+
       // Тик рынков
       doTick: () => {
-        const { world } = get();
+        const { world, player } = get();
+
+        // Проверяем и тратим ресурсы
+        const newInv = get().spendResource();
+        if (newInv === false) {
+          return false; // Не можем сделать тик без ресурсов
+        }
+
         const rng = createRNG(world.seed, world.tick + 1, 'tick');
 
         // Выбираем 2 случайных города для обновления
@@ -168,14 +232,17 @@ export const useGameStore = create<GameState>()(
             cityStates: newCityStates
           },
           player: {
-            ...get().player,
+            ...player,
+            inv: newInv,
             tradeLimits: {
               boughtItems: {},
               soldItems: {},
-              lastCityId: get().player.cityId
+              lastCityId: player.cityId
             }
           }
         });
+
+        return true;
       },
 
       // Предложение сделки
@@ -284,7 +351,13 @@ export const useGameStore = create<GameState>()(
           (r.from === toCityId && r.to === player.cityId)
         );
 
-        if (!road) return;
+        if (!road) return false;
+
+        // Проверяем и тратим ресурсы
+        const newInv = get().spendResource();
+        if (newInv === false) {
+          return false; // Не можем путешествовать без ресурсов
+        }
 
         // Automatic tick on travel
         const rng = createRNG(world.seed, world.tick + 1, 'tick');
@@ -316,6 +389,7 @@ export const useGameStore = create<GameState>()(
           },
           player: {
             ...player,
+            inv: newInv,
             cityId: toCityId,
             tradeLimits: {
               boughtItems: {},
@@ -325,6 +399,8 @@ export const useGameStore = create<GameState>()(
           },
           currentScreen: 'city'
         });
+
+        return true;
       },
 
       // Смена экрана

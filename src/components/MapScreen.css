@@ -285,6 +285,18 @@
     transform: none !important;
 }
 
+.btn.disabled {
+    background: rgba(108, 117, 125, 0.6) !important;
+    color: rgba(248, 249, 250, 0.8) !important;
+    cursor: not-allowed !important;
+    opacity: 1;
+}
+
+.btn.disabled:hover {
+    background: rgba(108, 117, 125, 0.6) !important;
+    transform: none !important;
+}
+
 
 
 /* Мобильная адаптация */
