@@ -142,21 +142,21 @@ const MapScreen = () => {
 
           {/* Кнопки действий */}
           <div className="action-buttons">
-            <button className="btn" onClick={() => setScreen('city')}>
+            <button className="btn return-btn" onClick={() => setScreen('city')}>
               Return to City
             </button>
             <button
               className="btn guard-btn"
-              disabled={true}
+              disabled={!selectedCityId}
             >
-              Hire Guard (Coming Soon)
+              Hire Guards
             </button>
             <button
               className="btn travel-btn"
               disabled={!selectedCityId}
               onClick={handleTravel}
             >
-              Travel
+              Travel without guards
             </button>
           </div>
         </div>

@@ -211,46 +211,78 @@
     margin-top: auto;
 }
 
-.guard-btn {
-    background: #6c757d;
-    color: #f8f9fa;
-    border: none;
+.btn.return-btn {
+    background: #28a745 !important;
+    color: white !important;
+    border: none !important;
     padding: 12px 24px;
     border-radius: 6px;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.guard-btn:hover {
-    background: #6c757d;
-    transform: none;
-}
-
-.travel-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
-    cursor: pointer;
+    cursor: pointer !important;
     transition: all 0.3s ease;
 }
 
-.travel-btn:hover:not(:disabled) {
-    background: #218838;
+.btn.return-btn:hover {
+    background: #218838 !important;
     transform: translateY(-1px);
 }
 
-.travel-btn:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-    opacity: 0.6;
+.btn.guard-btn {
+    background: rgba(108, 117, 125, 0.6) !important;
+    color: rgba(248, 249, 250, 0.8) !important;
+    border: none !important;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: not-allowed !important;
+    opacity: 1;
+    font-style: normal !important;
+    transition: all 0.3s ease;
 }
 
-.travel-btn:disabled:hover {
-    background: #6c757d;
-    transform: none;
+.btn.guard-btn:hover {
+    background: rgba(108, 117, 125, 0.6) !important;
+    transform: none !important;
 }
+
+.btn.guard-btn:not(:disabled) {
+    background: #0d6efd !important;
+    color: white !important;
+    cursor: pointer !important;
+    opacity: 1;
+}
+
+.btn.guard-btn:not(:disabled):hover {
+    background: #0b5ed7 !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn.travel-btn {
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.btn.travel-btn:hover:not(:disabled) {
+    background: #dc3545 !important;
+    transform: translateY(-1px);
+}
+
+.btn.travel-btn:disabled {
+    background: rgba(108, 117, 125, 0.6) !important;
+    color: rgba(248, 249, 250, 0.8) !important;
+    cursor: not-allowed !important;
+    opacity: 1;
+}
+
+.btn.travel-btn:disabled:hover {
+    background: rgba(108, 117, 125, 0.6) !important;
+    transform: none !important;
+}
+
+
 
 /* Мобильная адаптация */
 @media (max-width: 768px) {
