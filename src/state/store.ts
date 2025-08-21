@@ -286,9 +286,34 @@ export const useGameStore = create<GameState>()(
 
         if (!road) return;
 
-        // TODO: Реализовать логику засады и охраны
-        // Пока просто перемещаемся
+        // Automatic tick on travel
+        const rng = createRNG(world.seed, world.tick + 1, 'tick');
+
+        const cityIds = world.cities.map(c => c.id);
+        const selectedCities: string[] = [];
+
+        for (let i = 0; i < 2; i++) {
+          const available = cityIds.filter(id => !selectedCities.includes(id));
+          if (available.length > 0) {
+            selectedCities.push(rng.choice(available));
+          }
+        }
+
+        const newCityStates = { ...world.cityStates };
+        selectedCities.forEach(cityId => {
+          newCityStates[cityId] = {
+            cityId,
+            market: generateMarketMode(rng),
+            updatedAtTick: world.tick + 1
+          };
+        });
+
         set({
+          world: {
+            ...world,
+            tick: world.tick + 1,
+            cityStates: newCityStates
+          },
           player: {
             ...player,
             cityId: toCityId,
