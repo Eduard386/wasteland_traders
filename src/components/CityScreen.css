@@ -1,0 +1,207 @@
+/* Основной контейнер экрана города */
+.city-screen {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Фоновое изображение города */
+.city-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--color-primary);
+}
+
+/* Наложение поверх фона */
+.city-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Заголовок города */
+.city-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.city-name {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--color-light);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0 0 10px 0;
+}
+
+
+
+/* Кнопки действий */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  min-width: 120px;
+  font-size: 18px;
+  padding: 15px 25px;
+}
+
+/* Секция соседних городов */
+.neighbors {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.neighbors h3 {
+  color: var(--color-light);
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.neighbors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.neighbor-card {
+  background: rgba(47, 47, 47, 0.8);
+  border: 2px solid var(--color-accent);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+}
+
+.neighbor-card h4 {
+  color: var(--color-light);
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.price-preview {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.price-badge {
+  background: var(--color-gray);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.price-badge.cheap {
+  background: var(--color-red);
+}
+
+.price-badge.exp {
+  background: var(--color-green);
+}
+
+/* HUD внизу */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: auto;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tick-info {
+  color: var(--color-light);
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .city-overlay {
+    padding: 15px;
+  }
+  
+  .city-name {
+    font-size: 24px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .action-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .neighbors-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hud {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hud-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+  .city-overlay {
+    padding: 10px;
+  }
+  
+  .city-name {
+    font-size: 20px;
+  }
+  
+  .action-btn {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  .neighbors h3 {
+    font-size: 16px;
+  }
+  
+  .neighbor-card {
+    padding: 10px;
+  }
+}
