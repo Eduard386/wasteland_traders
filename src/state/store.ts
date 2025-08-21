@@ -14,6 +14,7 @@ interface GameState {
   // Экшены
   doTick: () => void;
   proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
+  executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   travel: (toCityId: string, useGuard: boolean) => void;
   setScreen: (screen: 'city' | 'barter' | 'travel' | 'map') => void;
   initializeGame: (seed?: number) => void;
@@ -195,6 +196,38 @@ export const useGameStore = create<GameState>()(
         for (const [good, count] of Object.entries(give)) {
           if ((player.inv[good as GoodId] || 0) < count) return false;
         }
+
+        return true;
+      },
+
+      // Выполнение сделки
+      executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => {
+        const { player } = get();
+        
+        if (!get().proposeTrade(give, take)) return false;
+
+        // Обновляем инвентарь игрока
+        const newInv = { ...player.inv };
+        
+        // Убираем отданные товары
+        for (const [good, count] of Object.entries(give)) {
+          newInv[good as GoodId] = (newInv[good as GoodId] || 0) - count;
+          if ((newInv[good as GoodId] || 0) <= 0) {
+            delete newInv[good as GoodId];
+          }
+        }
+        
+        // Добавляем полученные товары
+        for (const [good, count] of Object.entries(take)) {
+          newInv[good as GoodId] = (newInv[good as GoodId] || 0) + count;
+        }
+
+        set({
+          player: {
+            ...player,
+            inv: newInv
+          }
+        });
 
         return true;
       },

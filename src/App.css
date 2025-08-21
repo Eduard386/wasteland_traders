@@ -22,6 +22,9 @@ body {
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   min-height: 100vh;
   color: var(--color-light);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 .app {
