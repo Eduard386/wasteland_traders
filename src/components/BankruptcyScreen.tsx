@@ -12,7 +12,15 @@ const BankruptcyScreen = () => {
     };
 
     return (
-        <div className="bankruptcy-screen">
+        <div 
+            className="bankruptcy-screen"
+            style={{
+                backgroundImage: `url('/assets/bankrupt.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
             <div className="bankruptcy-content">
                 <h1 className="bankruptcy-title">
                     You invested everything into the business and now you are bankrupt.

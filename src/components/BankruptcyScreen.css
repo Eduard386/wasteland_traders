@@ -10,10 +10,6 @@
     align-items: center;
     color: #f8f9fa;
     z-index: 1000;
-    background-image: url('/assets/bankrupt.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 .bankruptcy-content {
