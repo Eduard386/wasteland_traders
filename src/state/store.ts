@@ -10,13 +10,13 @@ interface GameState {
   world: World;
   player: Player;
   currentScreen: 'city' | 'barter' | 'map';
-  
+
   // Экшены
   doTick: () => void;
   proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
-  travel: (toCityId: string, useGuard: boolean) => void;
-  setScreen: (screen: 'city' | 'barter' | 'travel' | 'map') => void;
+  travel: (toCityId: string) => void;
+  setScreen: (screen: 'city' | 'barter' | 'map') => void;
   initializeGame: (seed?: number) => void;
 }
 
@@ -32,27 +32,27 @@ const MARKET_WEIGHTS: Record<MarketMode, number> = {
 function generateMarketMode(rng: SeededRNG): CityMarket {
   const modes: MarketMode[] = Object.keys(MARKET_WEIGHTS) as MarketMode[];
   const weights = modes.map(mode => MARKET_WEIGHTS[mode]);
-  
+
   // Простой весовой выбор
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
   let random = rng.next() * totalWeight;
-  
+
   for (let i = 0; i < modes.length; i++) {
     random -= weights[i];
     if (random <= 0) {
       const mode = modes[i];
-      
+
       switch (mode) {
         case 'ALL2':
           return { mode };
         case 'ONE_CHEAP':
-          return { 
-            mode, 
+          return {
+            mode,
             cheap: [rng.choice(['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'] as GoodId[])]
           };
         case 'ONE_EXP':
-          return { 
-            mode, 
+          return {
+            mode,
             exp: [rng.choice(['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'] as GoodId[])]
           };
         case 'CHEAP_EXP': {
@@ -64,7 +64,7 @@ function generateMarketMode(rng: SeededRNG): CityMarket {
       }
     }
   }
-  
+
   return { mode: 'ALL2' };
 }
 
@@ -89,11 +89,11 @@ export const useGameStore = create<GameState>()(
       initializeGame: (seed?: number) => {
         const gameSeed = seed ?? Math.floor(Math.random() * 1000000);
         const { cities, roads } = createWorldGraph();
-        
+
         // Создаем начальные рынки для всех городов
         const cityStates: Record<string, CityState> = {};
         const rng = createRNG(gameSeed, 0, 'init');
-        
+
         cities.forEach(city => {
           cityStates[city.id] = {
             cityId: city.id,
@@ -106,7 +106,7 @@ export const useGameStore = create<GameState>()(
         const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
         const initialInv: Partial<Record<GoodId, number>> = {};
         const invRng = createRNG(gameSeed, 0, 'inventory');
-        
+
         for (let i = 0; i < 2; i++) {
           const good = invRng.choice(goods);
           initialInv[good] = (initialInv[good] || 0) + invRng.int(1, 4);
@@ -126,7 +126,7 @@ export const useGameStore = create<GameState>()(
           },
           currentScreen: 'city'
         });
-        
+
         // console.log('Game initialized with cities:', cities.map(c => ({ id: c.id, name: c.name })));
       },
 
@@ -134,11 +134,11 @@ export const useGameStore = create<GameState>()(
       doTick: () => {
         const { world } = get();
         const rng = createRNG(world.seed, world.tick + 1, 'tick');
-        
+
         // Выбираем 2 случайных города для обновления
         const cityIds = world.cities.map(c => c.id);
         const selectedCities: string[] = [];
-        
+
         for (let i = 0; i < 2; i++) {
           const available = cityIds.filter(id => !selectedCities.includes(id));
           if (available.length > 0) {
@@ -172,7 +172,7 @@ export const useGameStore = create<GameState>()(
         if (!currentCity) return false;
 
         const prices = getAllPrices(currentCity.market);
-        
+
         // Проверяем лимит ≤3 единиц одного товара
         for (const [, count] of Object.entries(take)) {
           if (count > 3) return false;
@@ -204,12 +204,12 @@ export const useGameStore = create<GameState>()(
       // Выполнение сделки
       executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => {
         const { player } = get();
-        
+
         if (!get().proposeTrade(give, take)) return false;
 
         // Обновляем инвентарь игрока
         const newInv = { ...player.inv };
-        
+
         // Убираем отданные товары
         for (const [good, count] of Object.entries(give)) {
           newInv[good as GoodId] = (newInv[good as GoodId] || 0) - count;
@@ -217,7 +217,7 @@ export const useGameStore = create<GameState>()(
             delete newInv[good as GoodId];
           }
         }
-        
+
         // Добавляем полученные товары
         for (const [good, count] of Object.entries(take)) {
           newInv[good as GoodId] = (newInv[good as GoodId] || 0) + count;
@@ -236,7 +236,7 @@ export const useGameStore = create<GameState>()(
       // Путешествие
       travel: (toCityId: string) => {
         const { world, player } = get();
-        const road = world.roads.find(r => 
+        const road = world.roads.find(r =>
           (r.from === player.cityId && r.to === toCityId) ||
           (r.from === toCityId && r.to === player.cityId)
         );

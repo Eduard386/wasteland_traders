@@ -4,8 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:with-lint": "npm run check && vite",
+    "dev": "npm run check && vite",
     "build": "npm run check && tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
