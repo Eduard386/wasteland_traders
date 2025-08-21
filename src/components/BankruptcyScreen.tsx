@@ -1,4 +1,5 @@
 import { useGameStore } from '../state/store';
+import { getBankruptImage } from '../utils/assets';
 import './BankruptcyScreen.css';
 
 const BankruptcyScreen = () => {
@@ -12,10 +13,10 @@ const BankruptcyScreen = () => {
     };
 
     return (
-        <div 
+        <div
             className="bankruptcy-screen"
             style={{
-                backgroundImage: `url('/assets/bankrupt.png')`,
+                backgroundImage: `url(${getBankruptImage()})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'

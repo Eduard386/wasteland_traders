@@ -25,3 +25,7 @@ export const getCityIcon = (cityId: string): string => {
 export const getWorldMap = (): string => {
   return getAssetPath('world_map.png');
 };
+
+export const getBankruptImage = (): string => {
+  return getAssetPath('bankrupt.png');
+};
