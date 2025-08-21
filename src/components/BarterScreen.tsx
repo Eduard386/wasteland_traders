@@ -126,7 +126,7 @@ const BarterScreen = () => {
       ));
   };
 
-  const renderTradeZone = (zoneId: string, items: Record<GoodId, number>, title: string, onClickHandler: (goodId: GoodId) => void) => {
+  const renderTradeZone = (items: Record<GoodId, number>, title: string, onClickHandler: (goodId: GoodId) => void) => {
     return (
       <div className="trade-zone">
         <h4 style={{ margin: '0 0 8px 0', color: '#f8f9fa' }}>{title}</h4>
@@ -181,8 +181,8 @@ const BarterScreen = () => {
 
           {/* Trade Zones */}
           <div className="trade-zones">
-            {renderTradeZone('give-zone', giveItems, 'Give Items', handleGiveItemClick)}
-            {renderTradeZone('take-zone', takeItems, 'Take Items', handleTakeItemClick)}
+            {renderTradeZone(giveItems, 'Give Items', handleGiveItemClick)}
+            {renderTradeZone(takeItems, 'Take Items', handleTakeItemClick)}
           </div>
 
           {/* Trade Summary */}
