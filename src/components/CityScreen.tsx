@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGameStore } from '../state/store';
 import GoodItem from './GoodItem';
 import type { GoodId } from '../lib/types';
+import { getAllPrices } from '../lib/values';
 import './GoodItem.css';
 import './CityScreen.css';
 
@@ -12,9 +13,14 @@ const CityScreen = () => {
 
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const currentCityState = world.cityStates[player.cityId];
-  const prices = currentCityState ? Object.fromEntries(
-    Object.entries(currentCityState.market).map(([good, price]) => [good, price])
-  ) : {};
+  const prices: Record<GoodId, 1 | 2 | 3> = currentCityState ? getAllPrices(currentCityState.market) : {
+    water: 2,
+    food: 2,
+    fuel: 2,
+    ammo: 2,
+    scrap: 2,
+    medicine: 2
+  };
 
   const getCityImage = (cityId: string) => {
     return `./assets/cities/${cityId}.png`;
@@ -94,16 +100,24 @@ const CityScreen = () => {
 
   const renderMarketItems = () => {
     const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
-    return goods.map(goodId => (
-      <GoodItem
-        key={goodId}
-        goodId={goodId}
-        count={0} // 0 означает "бесконечное количество"
-        price={prices[goodId] || 2}
-        isMarket={true}
-        onClick={() => handleMarketItemClick(goodId)}
-      />
-    ));
+    return goods.map(goodId => {
+      const price = prices[goodId] || 2;
+      const isCheap = price === 1;
+      const isExpensive = price === 3;
+
+      return (
+        <GoodItem
+          key={goodId}
+          goodId={goodId}
+          count={0} // 0 означает "бесконечное количество"
+          price={price}
+          isMarket={true}
+          isCheap={isCheap}
+          isExpensive={isExpensive}
+          onClick={() => handleMarketItemClick(goodId)}
+        />
+      );
+    });
   };
 
   const renderInventoryItems = () => {
@@ -117,31 +131,35 @@ const CityScreen = () => {
           count={count}
           price={prices[goodId as GoodId] || 2}
           isMarket={false}
+          isCheap={false}
+          isExpensive={false}
           onClick={() => handleInventoryItemClick(goodId as GoodId)}
         />
       ));
   };
 
-  const renderTradeZone = (items: Record<GoodId, number>, title: string, onClickHandler: (goodId: GoodId) => void) => {
-    const isTakeZone = title === 'Take';
+  const renderTradeZone = (items: Record<GoodId, number>, onClickHandler: (goodId: GoodId) => void) => {
     return (
       <div className="trade-zone">
-        <h4 style={{
-          margin: '0 0 8px 0',
-          color: '#f8f9fa',
-          textAlign: isTakeZone ? 'right' : 'left'
-        }}>{title}</h4>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-          {Object.entries(items).map(([goodId, count]) => (
-            <GoodItem
-              key={goodId}
-              goodId={goodId as GoodId}
-              count={count}
-              price={prices[goodId as GoodId] || 2}
-              isMarket={false}
-              onClick={() => onClickHandler(goodId as GoodId)}
-            />
-          ))}
+          {Object.entries(items).map(([goodId, count]) => {
+            const price = prices[goodId as GoodId] || 2;
+            const isCheap = price === 1;
+            const isExpensive = price === 3;
+
+            return (
+              <GoodItem
+                key={goodId}
+                goodId={goodId as GoodId}
+                count={count}
+                price={price}
+                isMarket={false}
+                isCheap={isCheap}
+                isExpensive={isExpensive}
+                onClick={() => onClickHandler(goodId as GoodId)}
+              />
+            );
+          })}
         </div>
       </div>
     );
@@ -180,9 +198,9 @@ const CityScreen = () => {
             </button>
           </div>
 
-          {/* Market Items (Top Row) */}
+          {/* Market Goods (Top Row) */}
           <div className="market-section">
-            <h3>Market Items</h3>
+            <h3>Market Goods</h3>
             <div className="items-row">
               {renderMarketItems()}
             </div>
@@ -190,17 +208,18 @@ const CityScreen = () => {
 
           {/* Trade Zones */}
           <div className="trade-zones">
-            {renderTradeZone(takeItems, 'Take', handleTakeItemClick)}
-            {renderTradeZone(giveItems, 'Give', handleGiveItemClick)}
+            <div className="trade-zone-container">
+              <h3 className="trade-zone-title">Take: {calculateValue(takeItems)}</h3>
+              {renderTradeZone(takeItems, handleTakeItemClick)}
+            </div>
+            <div className="trade-zone-container">
+              <h3 className="trade-zone-title">Give: {calculateValue(giveItems)}</h3>
+              {renderTradeZone(giveItems, handleGiveItemClick)}
+            </div>
           </div>
 
           {/* Trade Summary */}
           <div className="trade-summary">
-            <div className="trade-values">
-              <span>Give: {giveValue}</span>
-              <span>Take: {takeValue}</span>
-              <span>Difference: {giveValue - takeValue}</span>
-            </div>
             <button
               className="btn trade-btn"
               onClick={handleTrade}
@@ -210,9 +229,9 @@ const CityScreen = () => {
             </button>
           </div>
 
-          {/* Player Inventory (Bottom Row) */}
+          {/* Player Goods (Bottom Row) */}
           <div className="inventory-section">
-            <h3>Your Inventory</h3>
+            <h3>Your Goods</h3>
             <div className="items-row">
               {renderInventoryItems()}
             </div>

@@ -7,6 +7,8 @@ interface GoodItemProps {
   count: number;
   price: number;
   isMarket?: boolean;
+  isCheap?: boolean;
+  isExpensive?: boolean;
   onClick?: () => void;
 }
 
@@ -15,6 +17,8 @@ const GoodItem: React.FC<GoodItemProps> = ({
   count,
   price,
   isMarket = false,
+  isCheap: propIsCheap,
+  isExpensive: propIsExpensive,
   onClick
 }) => {
   const getGoodImage = (goodId: GoodId) => {
@@ -33,9 +37,8 @@ const GoodItem: React.FC<GoodItemProps> = ({
     return names[goodId];
   };
 
-  const isCheap = price === 1;
-  const isExpensive = price === 3;
-  const priceArrow = isCheap ? '⬇️' : isExpensive ? '⬆️' : '';
+  const isCheap = propIsCheap !== undefined ? propIsCheap : price === 1;
+  const isExpensive = propIsExpensive !== undefined ? propIsExpensive : price === 3;
 
   return (
     <div
@@ -52,13 +55,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
           e.currentTarget.style.display = 'none';
         }}
       />
-      {count > 0 && <div className="good-count">{count}</div>}
-      {priceArrow && (
-        <div className="price-indicator">
-          <span className="price-arrow">{priceArrow}</span>
-          <span className="price-value">{price}</span>
-        </div>
-      )}
+      {count > 1 && <div className="good-count">{count}</div>}
     </div>
   );
 };
