@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useGameStore } from '../state/store';
 import { GOODS, type Road, type GoodId } from '../lib/types';
 import { getCityIcon, getGoodImage, getWorldMap } from '../utils/assets';
@@ -47,10 +47,7 @@ const MapScreen = () => {
     }
   };
 
-  // Устанавливаем CSS переменную для фонового изображения
-  useEffect(() => {
-    document.documentElement.style.setProperty('--world-map-bg', `url(${getWorldMap()})`);
-  }, []);
+
 
   const getCityPosition = (cityId: string) => {
     const positions: Record<string, { top: string; left: string }> = {
@@ -68,7 +65,10 @@ const MapScreen = () => {
 
   return (
     <div className="map-screen">
-      <div className="map-background">
+      <div 
+        className="map-background"
+        style={{ backgroundImage: `url(${getWorldMap()})` }}
+      >
         <div className="map-content">
 
 
