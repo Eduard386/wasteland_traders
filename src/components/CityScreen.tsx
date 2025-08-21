@@ -3,6 +3,7 @@ import { useGameStore } from '../state/store';
 import GoodItem from './GoodItem';
 import type { GoodId } from '../lib/types';
 import { getAllPrices } from '../lib/values';
+import { getCityImage } from '../utils/assets';
 import './GoodItem.css';
 import './CityScreen.css';
 
@@ -22,9 +23,7 @@ const CityScreen = () => {
     medicine: 2
   };
 
-  const getCityImage = (cityId: string) => {
-    return `/assets/cities/${cityId}.png`;
-  };
+
 
   // Вычисляем доступный инвентарь (исключая товары в Give Items)
   const getAvailableInventory = () => {

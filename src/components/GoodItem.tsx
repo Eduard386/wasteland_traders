@@ -1,5 +1,6 @@
 import React from 'react';
 import type { GoodId } from '../lib/types';
+import { getGoodImage } from '../utils/assets';
 import './GoodItem.css';
 
 interface GoodItemProps {
@@ -21,9 +22,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
   isExpensive: propIsExpensive,
   onClick
 }) => {
-  const getGoodImage = (goodId: GoodId) => {
-    return `/assets/goods/${goodId}.png`;
-  };
+
 
   const getGoodName = (goodId: GoodId) => {
     const names: Record<GoodId, string> = {

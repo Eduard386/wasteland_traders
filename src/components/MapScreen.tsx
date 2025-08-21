@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameStore } from '../state/store';
 import { GOODS, type Road, type GoodId } from '../lib/types';
+import { getCityIcon, getGoodImage, getWorldMap } from '../utils/assets';
 import './MapScreen.css';
 
 const MapScreen = () => {
@@ -46,13 +47,10 @@ const MapScreen = () => {
     }
   };
 
-  const getCityIcon = (cityId: string) => {
-    return `/assets/city_icons/icon_${cityId}.png`;
-  };
-
-  const getGoodIcon = (goodId: GoodId) => {
-    return `/assets/goods/${goodId}.png`;
-  };
+  // Устанавливаем CSS переменную для фонового изображения
+  useEffect(() => {
+    document.documentElement.style.setProperty('--world-map-bg', `url(${getWorldMap()})`);
+  }, []);
 
   const getCityPosition = (cityId: string) => {
     const positions: Record<string, { top: string; left: string }> = {
@@ -97,7 +95,7 @@ const MapScreen = () => {
                     {cityGoods.cheap.map((goodId: GoodId) => (
                       <div key={`cheap-${goodId}`} className="good-indicator cheap">
                         <img
-                          src={getGoodIcon(goodId)}
+                          src={getGoodImage(goodId)}
                           alt={GOODS[goodId]}
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
@@ -110,7 +108,7 @@ const MapScreen = () => {
                     {cityGoods.exp.map((goodId: GoodId) => (
                       <div key={`exp-${goodId}`} className="good-indicator expensive">
                         <img
-                          src={getGoodIcon(goodId)}
+                          src={getGoodImage(goodId)}
                           alt={GOODS[goodId]}
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
