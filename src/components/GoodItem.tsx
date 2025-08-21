@@ -1,7 +1,6 @@
 import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
 import type { GoodId } from '../lib/types';
+import './GoodItem.css';
 
 interface GoodItemProps {
   goodId: GoodId;
@@ -11,63 +10,54 @@ interface GoodItemProps {
   onClick?: () => void;
 }
 
-const GoodItem: React.FC<GoodItemProps> = ({ 
-  goodId, 
-  count, 
-  price, 
+const GoodItem: React.FC<GoodItemProps> = ({
+  goodId,
+  count,
+  price,
   isMarket = false,
-  onClick 
+  onClick
 }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: `${goodId}-${count}`,
-    data: {
-      goodId,
-      count,
-      price,
-      isMarket
-    }
-  });
-
-  const style = {
-    transform: CSS.Translate.toString(transform),
+  const getGoodImage = (goodId: GoodId) => {
+    return `./assets/goods/${goodId}.png`;
   };
 
-  const getPriceClass = () => {
-    if (price === 1) return 'cheap';
-    if (price === 3) return 'exp';
-    return '';
+  const getGoodName = (goodId: GoodId) => {
+    const names: Record<GoodId, string> = {
+      water: 'Water',
+      food: 'Food',
+      fuel: 'Fuel',
+      ammo: 'Ammo',
+      scrap: 'Scrap',
+      medicine: 'Medicine'
+    };
+    return names[goodId];
   };
 
-  const getPriceArrow = () => {
-    if (price === 1) return '⬇️';
-    if (price === 3) return '⬆️';
-    return '';
-  };
+  const isCheap = price === 1;
+  const isExpensive = price === 3;
+  const priceArrow = isCheap ? '⬇️' : isExpensive ? '⬆️' : '';
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      className={`good-item ${getPriceClass()} ${isMarket ? 'market' : 'inventory'}`}
+    <div 
+      className={`good-item ${isCheap ? 'cheap' : ''} ${isExpensive ? 'exp' : ''} ${isMarket ? 'market' : 'inventory'}`}
       onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
-      <div className="good-image">
-        <img 
-          src={`./assets/goods/${goodId}.png`} 
-          alt={goodId}
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      </div>
+      <img 
+        src={getGoodImage(goodId)} 
+        alt={getGoodName(goodId)}
+        className="good-image"
+        onError={(e) => {
+          console.error(`Failed to load image for ${goodId}`);
+          e.currentTarget.style.display = 'none';
+        }}
+      />
       <div className="good-info">
-        <div className="good-name">{goodId}</div>
-        <div className="good-count">{count}</div>
-        {isMarket && (
+        <div className="good-name">{getGoodName(goodId)}</div>
+        {count > 0 && <div className="good-count">{count}</div>}
+        {priceArrow && (
           <div className="price-indicator">
-            <span className="price-arrow">{getPriceArrow()}</span>
+            <span className="price-arrow">{priceArrow}</span>
             <span className="price-value">{price}</span>
           </div>
         )}

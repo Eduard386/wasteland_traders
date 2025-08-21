@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { DndContext, DragOverlay, useDroppable } from '@dnd-kit/core';
-import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useGameStore } from '../state/store';
 import GoodItem from './GoodItem';
 import type { GoodId } from '../lib/types';
@@ -8,14 +6,13 @@ import './GoodItem.css';
 import './BarterScreen.css';
 
 const BarterScreen = () => {
-  const { 
-    world, 
-    player, 
-    setScreen, 
-    executeTrade 
+  const {
+    world,
+    player,
+    setScreen,
+    executeTrade
   } = useGameStore();
 
-  const [activeId, setActiveId] = useState<string | null>(null);
   const [giveItems, setGiveItems] = useState<Record<GoodId, number>>({} as Record<GoodId, number>);
   const [takeItems, setTakeItems] = useState<Record<GoodId, number>>({} as Record<GoodId, number>);
 
@@ -24,35 +21,22 @@ const BarterScreen = () => {
     Object.entries(currentCity.market).map(([good, price]) => [good, price])
   ) : {};
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  // Вычисляем доступный инвентарь (исключая товары в Give Items)
+  const getAvailableInventory = () => {
+    const available: Partial<Record<GoodId, number>> = { ...player.inv };
     
-    if (over && active.data.current) {
-      const { goodId, isMarket } = active.data.current;
-      const targetId = over.id as string;
-      
-      // Проверяем логику: только инвентарь в give-zone, только рынок в take-zone
-      if (targetId === 'give-zone' && !isMarket) {
-        // Добавляем в отдаваемые товары (только из инвентаря)
-        setGiveItems(prev => ({
-          ...prev,
-          [goodId]: (prev[goodId as GoodId] || 0) + 1
-        }));
-      } else if (targetId === 'take-zone' && isMarket) {
-        // Добавляем в получаемые товары (только с рынка)
-        setTakeItems(prev => ({
-          ...prev,
-          [goodId]: (prev[goodId as GoodId] || 0) + 1
-        }));
+    // Вычитаем товары, которые уже в Give Items
+    Object.entries(giveItems).forEach(([goodId, count]) => {
+      const good = goodId as GoodId;
+      if (available[good]) {
+        available[good] = (available[good] || 0) - count;
+        if ((available[good] || 0) <= 0) {
+          delete available[good];
+        }
       }
-      // Игнорируем все остальные комбинации
-    }
+    });
     
-    setActiveId(null);
+    return available;
   };
 
   const handleTrade = () => {
@@ -71,9 +55,46 @@ const BarterScreen = () => {
     }, 0);
   };
 
-  const giveValue = calculateValue(giveItems);
-  const takeValue = calculateValue(takeItems);
-  const isValidTrade = giveValue >= takeValue && Object.values(takeItems).every(count => count <= 3);
+  const handleMarketItemClick = (goodId: GoodId) => {
+    setTakeItems(prev => ({
+      ...prev,
+      [goodId]: (prev[goodId] || 0) + 1
+    }));
+  };
+
+  const handleTakeItemClick = (goodId: GoodId) => {
+    setTakeItems(prev => {
+      const newItems = { ...prev };
+      if (newItems[goodId] === 1) {
+        delete newItems[goodId];
+      } else {
+        newItems[goodId]--;
+      }
+      return newItems;
+    });
+  };
+
+  const handleInventoryItemClick = (goodId: GoodId) => {
+    const available = getAvailableInventory();
+    if (available[goodId] && available[goodId] > 0) {
+      setGiveItems(prev => ({
+        ...prev,
+        [goodId]: (prev[goodId] || 0) + 1
+      }));
+    }
+  };
+
+  const handleGiveItemClick = (goodId: GoodId) => {
+    setGiveItems(prev => {
+      const newItems = { ...prev };
+      if (newItems[goodId] === 1) {
+        delete newItems[goodId];
+      } else {
+        newItems[goodId]--;
+      }
+      return newItems;
+    });
+  };
 
   const renderMarketItems = () => {
     const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
@@ -81,15 +102,17 @@ const BarterScreen = () => {
       <GoodItem
         key={goodId}
         goodId={goodId}
-        count={1}
+        count={0} // 0 означает "бесконечное количество"
         price={prices[goodId] || 2}
         isMarket={true}
+        onClick={() => handleMarketItemClick(goodId)}
       />
     ));
   };
 
   const renderInventoryItems = () => {
-    return Object.entries(player.inv)
+    const available = getAvailableInventory();
+    return Object.entries(available)
       .filter(([, count]) => count > 0)
       .map(([goodId, count]) => (
         <GoodItem
@@ -98,141 +121,96 @@ const BarterScreen = () => {
           count={count}
           price={prices[goodId as GoodId] || 2}
           isMarket={false}
+          onClick={() => handleInventoryItemClick(goodId as GoodId)}
         />
       ));
   };
 
-  const TradeZone = ({ zoneId, items, title }: { zoneId: string, items: Record<GoodId, number>, title: string }) => {
-    const { setNodeRef, isOver } = useDroppable({
-      id: zoneId,
-    });
-
+  const renderTradeZone = (zoneId: string, items: Record<GoodId, number>, title: string, onClickHandler: (goodId: GoodId) => void) => {
     return (
-      <div
-        ref={setNodeRef}
-        className="trade-zone"
-        style={{
-          minHeight: '120px',
-          border: '2px dashed #868e96',
-          borderRadius: '8px',
-          padding: '8px',
-          margin: '8px',
-          background: isOver ? 'rgba(255, 212, 59, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-          borderColor: isOver ? '#ffd43b' : '#868e96'
-        }}
-      >
+      <div className="trade-zone">
         <h4 style={{ margin: '0 0 8px 0', color: '#f8f9fa' }}>{title}</h4>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
           {Object.entries(items).map(([goodId, count]) => (
-            <div key={goodId} className="trade-item">
-              <span>{goodId}: {count}</span>
-              <button
-                onClick={() => {
-                  if (zoneId === 'give-zone') {
-                    setGiveItems(prev => {
-                      const newItems = { ...prev };
-                      if (newItems[goodId as GoodId] === 1) {
-                        delete newItems[goodId as GoodId];
-                      } else {
-                        newItems[goodId as GoodId]--;
-                      }
-                      return newItems;
-                    });
-                  } else {
-                    setTakeItems(prev => {
-                      const newItems = { ...prev };
-                      if (newItems[goodId as GoodId] === 1) {
-                        delete newItems[goodId as GoodId];
-                      } else {
-                        newItems[goodId as GoodId]--;
-                      }
-                      return newItems;
-                    });
-                  }
-                }}
-                style={{ marginLeft: '4px', fontSize: '10px' }}
-              >
-                ×
-              </button>
-            </div>
+            <GoodItem
+              key={goodId}
+              goodId={goodId as GoodId}
+              count={count}
+              price={prices[goodId as GoodId] || 2}
+              isMarket={false}
+              onClick={() => onClickHandler(goodId as GoodId)}
+            />
           ))}
         </div>
       </div>
     );
   };
 
+  const giveValue = calculateValue(giveItems);
+  const takeValue = calculateValue(takeItems);
+  const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0;
+
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="barter-screen">
-        <div 
-          className="barter-background"
-          style={{
-            backgroundImage: 'url(./assets/barter/barter.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            minHeight: '100vh',
-            width: '100%',
-            padding: '20px',
-            boxSizing: 'border-box'
-          }}
-        >
-          <div className="barter-content">
-            <div className="barter-header">
-              <h2 className="title">Barter</h2>
-              <button className="btn" onClick={() => setScreen('city')}>
-                Return to City
-              </button>
-            </div>
+    <div className="barter-screen">
+      <div
+        className="barter-background"
+        style={{
+          backgroundImage: 'url(./assets/barter/barter.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          minHeight: '100vh',
+          width: '100%',
+          padding: '20px',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div className="barter-content">
+          <div className="barter-header">
+            <button className="btn" onClick={() => setScreen('city')}>
+              Return to City
+            </button>
+          </div>
 
-            {/* Market Items (Top Row) */}
-            <div className="market-section">
-              <h3>Market Items</h3>
-              <div className="items-row">
-                {renderMarketItems()}
-              </div>
+          {/* Market Items (Top Row) */}
+          <div className="market-section">
+            <h3>Market Items</h3>
+            <div className="items-row">
+              {renderMarketItems()}
             </div>
+          </div>
 
-            {/* Trade Zones */}
-            <div className="trade-zones">
-              <TradeZone zoneId="give-zone" items={giveItems} title="Give Items" />
-              <TradeZone zoneId="take-zone" items={takeItems} title="Take Items" />
+          {/* Trade Zones */}
+          <div className="trade-zones">
+            {renderTradeZone('give-zone', giveItems, 'Give Items', handleGiveItemClick)}
+            {renderTradeZone('take-zone', takeItems, 'Take Items', handleTakeItemClick)}
+          </div>
+
+          {/* Trade Summary */}
+          <div className="trade-summary">
+            <div className="trade-values">
+              <span>Give: {giveValue}</span>
+              <span>Take: {takeValue}</span>
+              <span>Difference: {giveValue - takeValue}</span>
             </div>
+            <button
+              className="btn trade-btn"
+              onClick={handleTrade}
+              disabled={!isValidTrade || giveValue === 0}
+            >
+              Barter
+            </button>
+          </div>
 
-            {/* Trade Summary */}
-            <div className="trade-summary">
-              <div className="trade-values">
-                <span>Give: {giveValue}</span>
-                <span>Take: {takeValue}</span>
-                <span>Difference: {giveValue - takeValue}</span>
-              </div>
-              <button 
-                className="btn trade-btn"
-                onClick={handleTrade}
-                disabled={!isValidTrade || giveValue === 0}
-              >
-                Trade
-              </button>
-            </div>
-
-            {/* Player Inventory (Bottom Row) */}
-            <div className="inventory-section">
-              <h3>Your Inventory</h3>
-              <div className="items-row">
-                {renderInventoryItems()}
-              </div>
+          {/* Player Inventory (Bottom Row) */}
+          <div className="inventory-section">
+            <h3>Your Inventory</h3>
+            <div className="items-row">
+              {renderInventoryItems()}
             </div>
           </div>
         </div>
-
-        <DragOverlay>
-          {activeId ? (
-            <div className="drag-overlay">
-              <span>Dragging...</span>
-            </div>
-          ) : null}
-        </DragOverlay>
       </div>
-    </DndContext>
+    </div>
   );
 };
 
