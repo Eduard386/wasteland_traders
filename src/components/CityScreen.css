@@ -1,207 +1,223 @@
-/* Основной контейнер экрана города */
+/* Базовые стили для города */
 .city-screen {
+  min-height: 100vh;
   width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Фоновое изображение города */
-.city-background {
-  position: absolute;
+  color: #f8f9fa;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  overflow-y: auto;
+}
+
+.city-background {
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  background-color: var(--color-primary);
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
 }
 
-/* Наложение поверх фона */
 .city-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  min-height: 100vh;
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
-}
-
-/* Заголовок города */
-.city-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
+}
+
+.city-header {
   text-align: center;
+  margin-bottom: 30px;
 }
 
 .city-name {
-  font-size: 32px;
-  font-weight: bold;
-  color: var(--color-light);
+  margin: 0;
+  color: #f8f9fa;
+  font-size: 2.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  margin: 0 0 10px 0;
 }
 
-
-
-/* Кнопки действий */
 .action-buttons {
   display: flex;
-  gap: 15px;
   justify-content: center;
+  gap: 20px;
   margin-bottom: 30px;
-  flex-wrap: wrap;
 }
 
 .action-btn {
-  min-width: 120px;
-  font-size: 18px;
-  padding: 15px 25px;
-}
-
-/* Секция соседних городов */
-.neighbors {
-  flex: 1;
-  margin-bottom: 20px;
-}
-
-.neighbors h3 {
-  color: var(--color-light);
-  margin-bottom: 15px;
-  text-align: center;
-  font-size: 18px;
-}
-
-.neighbors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.neighbor-card {
-  background: rgba(47, 47, 47, 0.8);
-  border: 2px solid var(--color-accent);
-  border-radius: 12px;
-  padding: 15px;
-  text-align: center;
-}
-
-.neighbor-card h4 {
-  color: var(--color-light);
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.price-preview {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.price-badge {
-  background: var(--color-gray);
+  background: #17a2b8;
   color: white;
-  padding: 4px 8px;
+  border: none;
+  padding: 12px 24px;
   border-radius: 6px;
-  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: bold;
 }
 
-.price-badge.cheap {
-  background: var(--color-red);
+.action-btn:hover {
+  background: #138496;
+  transform: translateY(-1px);
 }
 
-.price-badge.exp {
-  background: var(--color-green);
+/* Стили для бартера */
+.market-section,
+.inventory-section {
+  margin: 20px 0;
 }
 
-/* HUD внизу */
-.hud {
+.market-section h3,
+.inventory-section h3 {
+  margin-bottom: 10px;
+  color: #f8f9fa;
+  text-align: center;
+}
+
+.items-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  min-height: 120px;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  margin: 0 auto;
+  min-width: 200px;
+}
+
+.items-row:empty {
+  background: transparent;
+  min-height: auto;
+  padding: 0;
+}
+
+.trade-zones {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.trade-zone {
+  flex: 1;
+  min-width: 300px;
+  min-height: 120px;
+  border: 2px dashed #868e96;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px;
+  background: rgba(210, 180, 140, 0.6);
+  border-color: #868e96;
+  position: relative;
+}
+
+.trade-summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px auto;
+  width: fit-content;
+  min-width: 300px;
+  gap: 20px;
+}
+
+.trade-values {
+  display: flex;
+  gap: 20px;
+  color: #f8f9fa;
+}
+
+.trade-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.trade-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.trade-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+/* HUD */
+.hud {
   margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 2px solid #495057;
 }
 
 .hud-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .tick-info {
-  color: var(--color-light);
+  color: #f8f9fa;
   font-weight: bold;
-  font-size: 16px;
 }
 
-/* Адаптивность для мобильных устройств */
+/* Мобильная адаптация */
 @media (max-width: 768px) {
   .city-overlay {
     padding: 15px;
   }
-  
+
   .city-name {
-    font-size: 24px;
+    font-size: 2rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
-  .action-btn {
-    width: 100%;
-    max-width: 200px;
-  }
-  
-  .neighbors-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .hud {
+
+  .trade-zones {
     flex-direction: column;
-    align-items: center;
   }
-  
-  .hud-item {
+
+  .trade-zone {
+    min-width: auto;
+  }
+
+  .trade-summary {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .trade-values {
     flex-direction: column;
     gap: 5px;
   }
-}
 
-/* Адаптивность для очень маленьких экранов */
-@media (max-width: 480px) {
-  .city-overlay {
-    padding: 10px;
+  .items-row {
+    justify-content: center;
+    width: 90%;
+    min-width: auto;
   }
-  
-  .city-name {
-    font-size: 20px;
-  }
-  
-  .action-btn {
-    font-size: 16px;
-    padding: 12px 20px;
-  }
-  
-  .neighbors h3 {
-    font-size: 16px;
-  }
-  
-  .neighbor-card {
-    padding: 10px;
+
+  .hud {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
   }
 }

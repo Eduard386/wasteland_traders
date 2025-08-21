@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGameStore } from '../state/store';
-import type { Road } from '../lib/types';
+import { GOODS, type Road, type GoodId } from '../lib/types';
 import './MapScreen.css';
 
 const MapScreen = () => {
@@ -17,6 +17,17 @@ const MapScreen = () => {
       (r.from === player.cityId && r.to === toCityId) ||
       (r.from === toCityId && r.to === player.cityId)
     ) || null;
+  };
+
+  // Получение информации о товарах города
+  const getCityGoods = (cityId: string) => {
+    const cityState = world.cityStates[cityId];
+    if (!cityState) return { cheap: [], exp: [] };
+
+    return {
+      cheap: cityState.market.cheap || [],
+      exp: cityState.market.exp || []
+    };
   };
 
   const handleCityClick = (cityId: string) => {
@@ -39,12 +50,16 @@ const MapScreen = () => {
     return `./assets/city_icons/icon_${cityId}.png`;
   };
 
+  const getGoodIcon = (goodId: GoodId) => {
+    return `./assets/goods/${goodId}.png`;
+  };
+
   const getCityPosition = (cityId: string) => {
     const positions: Record<string, { top: string; left: string }> = {
-      'rust_town': { top: '20%', left: '20%' },
-      'metal_hill': { top: '20%', left: '70%' },
-      'dusty_oasis': { top: '70%', left: '20%' },
-      'bottle_cap_canyon': { top: '70%', left: '70%' }
+      'rust_town': { top: '25%', left: '25%' },
+      'metal_hill': { top: '25%', left: '75%' },
+      'dusty_oasis': { top: '75%', left: '25%' },
+      'bottle_cap_canyon': { top: '75%', left: '75%' }
     };
     return positions[cityId] || { top: '50%', left: '50%' };
   };
@@ -57,29 +72,16 @@ const MapScreen = () => {
     <div className="map-screen">
       <div className="map-background">
         <div className="map-content">
-          {/* Заголовок */}
-          <div className="map-header">
-            <h2 className="title">World Map</h2>
-            <button className="btn" onClick={() => setScreen('city')}>
-              Return to City
-            </button>
-          </div>
+
 
           {/* Карта мира */}
           <div className="world-map">
-            {/* Дороги между городами */}
-            <svg className="roads-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
-              {/* Дороги в форме квадрата */}
-              <line x1="20" y1="20" x2="70" y2="20" className="road" />
-              <line x1="20" y1="20" x2="20" y2="70" className="road" />
-              <line x1="70" y1="20" x2="70" y2="70" className="road" />
-              <line x1="20" y1="70" x2="70" y2="70" className="road" />
-            </svg>
 
             {/* Города */}
             {world.cities.map(city => {
               const position = getCityPosition(city.id);
               const route = getRouteInfo(city.id);
+              const cityGoods = getCityGoods(city.id);
               const cityClass = `city-icon ${isCurrentCity(city.id) ? 'current' : ''} ${isNeighbor(city.id) ? 'neighbor' : ''} ${isSelected(city.id) ? 'selected' : ''}`;
 
               return (
@@ -89,6 +91,36 @@ const MapScreen = () => {
                   style={position}
                   onClick={() => handleCityClick(city.id)}
                 >
+                  {/* Товары над городом */}
+                  <div className="city-goods">
+                    {/* Дешевые товары (красные) */}
+                    {cityGoods.cheap.map((goodId: GoodId) => (
+                      <div key={`cheap-${goodId}`} className="good-indicator cheap">
+                        <img
+                          src={getGoodIcon(goodId)}
+                          alt={GOODS[goodId]}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                        <span className="good-name">{GOODS[goodId]}</span>
+                      </div>
+                    ))}
+                    {/* Дорогие товары (зеленые) */}
+                    {cityGoods.exp.map((goodId: GoodId) => (
+                      <div key={`exp-${goodId}`} className="good-indicator expensive">
+                        <img
+                          src={getGoodIcon(goodId)}
+                          alt={GOODS[goodId]}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                        <span className="good-name">{GOODS[goodId]}</span>
+                      </div>
+                    ))}
+                  </div>
+
                   <img
                     src={getCityIcon(city.id)}
                     alt={city.name}
@@ -112,6 +144,9 @@ const MapScreen = () => {
 
           {/* Кнопки действий */}
           <div className="action-buttons">
+            <button className="btn" onClick={() => setScreen('city')}>
+              Return to City
+            </button>
             <button
               className="btn guard-btn"
               disabled={true}

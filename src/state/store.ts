@@ -9,14 +9,14 @@ interface GameState {
   // Состояние
   world: World;
   player: Player;
-  currentScreen: 'city' | 'barter' | 'map';
+  currentScreen: 'city' | 'map';
 
   // Экшены
   doTick: () => void;
   proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   travel: (toCityId: string) => void;
-  setScreen: (screen: 'city' | 'barter' | 'map') => void;
+  setScreen: (screen: 'city' | 'map') => void;
   initializeGame: (seed?: number) => void;
 }
 
@@ -255,7 +255,7 @@ export const useGameStore = create<GameState>()(
       },
 
       // Смена экрана
-      setScreen: (screen: 'city' | 'barter' | 'map') => {
+      setScreen: (screen: 'city' | 'map') => {
         set({ currentScreen: screen });
       }
     }),

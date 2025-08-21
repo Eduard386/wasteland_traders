@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useGameStore } from './state/store';
 import CityScreen from './components/CityScreen';
-import BarterScreen from './components/BarterScreen';
-
 import MapScreen from './components/MapScreen';
 import './App.css';
 
@@ -21,9 +19,6 @@ function App() {
     switch (currentScreen) {
       case 'city':
         return <CityScreen />;
-      case 'barter':
-        return <BarterScreen />;
-      
       case 'map':
         return <MapScreen />;
       default:
