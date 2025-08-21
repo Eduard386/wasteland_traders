@@ -5,7 +5,7 @@ import './CityScreen.css';
 
 const CityScreen = () => {
   const { world, player, doTick, setScreen } = useGameStore();
-  
+
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const currentCityState = world.cityStates[player.cityId];
   const neighbors = getNeighbors(player.cityId, world.cities);
@@ -24,11 +24,11 @@ const CityScreen = () => {
   }
 
   // console.log('Current city:', currentCity.id, 'Image path:', getCityImage(currentCity.id));
-  
+
   // Проверяем загрузку изображения
   const img = new Image();
-  img.onload = () => {/* console.log('Image loaded successfully:', getCityImage(currentCity.id)) */};
-  img.onerror = () => {/* console.log('Image failed to load:', getCityImage(currentCity.id)) */};
+  img.onload = () => {/* console.log('Image loaded successfully:', getCityImage(currentCity.id)) */ };
+  img.onerror = () => {/* console.log('Image failed to load:', getCityImage(currentCity.id)) */ };
   img.src = getCityImage(currentCity.id);
 
   const handleImageError = () => {
@@ -40,9 +40,9 @@ const CityScreen = () => {
   return (
     <div className="city-screen">
       {/* Фон города */}
-      <div 
+      <div
         className="city-background"
-        style={{ 
+        style={{
           backgroundImage: `url(${getCityImage(currentCity.id)})`
         }}
         onError={handleImageError}
@@ -55,19 +55,13 @@ const CityScreen = () => {
 
           {/* Кнопки действий */}
           <div className="action-buttons">
-            <button 
+            <button
               className="btn action-btn"
               onClick={() => setScreen('barter')}
             >
               Barter
             </button>
-            <button 
-              className="btn action-btn"
-              onClick={() => setScreen('travel')}
-            >
-              Travel
-            </button>
-            <button 
+            <button
               className="btn action-btn"
               onClick={() => setScreen('map')}
             >
@@ -86,8 +80,8 @@ const CityScreen = () => {
                     {/* Превью цен соседнего города */}
                     <div className="price-preview">
                       {Object.entries(prices).slice(0, 3).map(([good, price]) => (
-                        <span 
-                          key={good} 
+                        <span
+                          key={good}
                           className={`price-badge ${price === 1 ? 'cheap' : price === 3 ? 'exp' : ''}`}
                         >
                           {price}

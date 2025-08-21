@@ -9,7 +9,7 @@ interface GameState {
   // Состояние
   world: World;
   player: Player;
-  currentScreen: 'city' | 'barter' | 'travel' | 'map';
+  currentScreen: 'city' | 'barter' | 'map';
   
   // Экшены
   doTick: () => void;
@@ -255,7 +255,7 @@ export const useGameStore = create<GameState>()(
       },
 
       // Смена экрана
-      setScreen: (screen: 'city' | 'barter' | 'travel' | 'map') => {
+      setScreen: (screen: 'city' | 'barter' | 'map') => {
         set({ currentScreen: screen });
       }
     }),

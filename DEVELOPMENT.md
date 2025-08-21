@@ -14,7 +14,8 @@ git checkout -b dev/feature-name
 
 ### 3. Тестирование
 ```bash
-npm run dev  # Запуск локального сервера
+npm run dev  # Запуск локального сервера (быстро)
+npm run dev:with-lint  # Запуск с проверкой кода
 # Откройте http://localhost:5173/
 ```
 

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useGameStore } from './state/store';
 import CityScreen from './components/CityScreen';
 import BarterScreen from './components/BarterScreen';
-import TravelScreen from './components/TravelScreen';
+
 import MapScreen from './components/MapScreen';
 import './App.css';
 
@@ -23,8 +23,7 @@ function App() {
         return <CityScreen />;
       case 'barter':
         return <BarterScreen />;
-      case 'travel':
-        return <TravelScreen />;
+      
       case 'map':
         return <MapScreen />;
       default:
