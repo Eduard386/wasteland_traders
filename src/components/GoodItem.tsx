@@ -22,7 +22,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
   onClick
 }) => {
   const getGoodImage = (goodId: GoodId) => {
-    return `./assets/goods/${goodId}.png`;
+    return `/assets/goods/${goodId}.png`;
   };
 
   const getGoodName = (goodId: GoodId) => {

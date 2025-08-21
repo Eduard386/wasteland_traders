@@ -47,11 +47,11 @@ const MapScreen = () => {
   };
 
   const getCityIcon = (cityId: string) => {
-    return `./assets/city_icons/icon_${cityId}.png`;
+    return `/assets/city_icons/icon_${cityId}.png`;
   };
 
   const getGoodIcon = (goodId: GoodId) => {
-    return `./assets/goods/${goodId}.png`;
+    return `/assets/goods/${goodId}.png`;
   };
 
   const getCityPosition = (cityId: string) => {

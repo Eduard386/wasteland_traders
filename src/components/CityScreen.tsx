@@ -23,7 +23,7 @@ const CityScreen = () => {
   };
 
   const getCityImage = (cityId: string) => {
-    return `./assets/cities/${cityId}.png`;
+    return `/assets/cities/${cityId}.png`;
   };
 
   // Вычисляем доступный инвентарь (исключая товары в Give Items)
