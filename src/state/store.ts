@@ -122,7 +122,12 @@ export const useGameStore = create<GameState>()(
           },
           player: {
             cityId: cities[0].id, // Начинаем с первого города
-            inv: initialInv
+            inv: initialInv,
+            tradeLimits: {
+              boughtItems: {},
+              soldItems: {},
+              lastCityId: cities[0].id
+            }
           },
           currentScreen: 'city'
         });
@@ -161,6 +166,14 @@ export const useGameStore = create<GameState>()(
             ...world,
             tick: world.tick + 1,
             cityStates: newCityStates
+          },
+          player: {
+            ...get().player,
+            tradeLimits: {
+              boughtItems: {},
+              soldItems: {},
+              lastCityId: get().player.cityId
+            }
           }
         });
       },
@@ -203,9 +216,34 @@ export const useGameStore = create<GameState>()(
 
       // Выполнение сделки
       executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => {
-        const { player } = get();
+        const { world, player } = get();
 
         if (!get().proposeTrade(give, take)) return false;
+
+        const currentCity = world.cityStates[player.cityId];
+        if (!currentCity) return false;
+
+        // Backward compatibility for tradeLimits
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tradeLimits = (player as any).tradeLimits || { boughtItems: {}, soldItems: {}, lastCityId: player.cityId };
+        const boughtItems = { ...tradeLimits.boughtItems };
+        const soldItems = { ...tradeLimits.soldItems };
+
+        // Check and update buy limits
+        for (const [good, count] of Object.entries(take)) {
+          const goodId = good as GoodId;
+          const currentBought = boughtItems[goodId] || 0;
+          if (currentBought + count > 2) return false; // Limit 2 per item
+          boughtItems[goodId] = currentBought + count;
+        }
+
+        // Check and update sell limits
+        for (const [good, count] of Object.entries(give)) {
+          const goodId = good as GoodId;
+          const currentSold = soldItems[goodId] || 0;
+          if (currentSold + count > 2) return false; // Limit 2 per item
+          soldItems[goodId] = currentSold + count;
+        }
 
         // Обновляем инвентарь игрока
         const newInv = { ...player.inv };
@@ -226,7 +264,12 @@ export const useGameStore = create<GameState>()(
         set({
           player: {
             ...player,
-            inv: newInv
+            inv: newInv,
+            tradeLimits: {
+              boughtItems,
+              soldItems,
+              lastCityId: player.cityId
+            }
           }
         });
 
@@ -248,7 +291,12 @@ export const useGameStore = create<GameState>()(
         set({
           player: {
             ...player,
-            cityId: toCityId
+            cityId: toCityId,
+            tradeLimits: {
+              boughtItems: {},
+              soldItems: {},
+              lastCityId: toCityId
+            }
           },
           currentScreen: 'city'
         });

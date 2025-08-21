@@ -10,6 +10,7 @@ interface GoodItemProps {
   isMarket?: boolean;
   isCheap?: boolean;
   isExpensive?: boolean;
+  isLimitReached?: boolean;
   onClick?: () => void;
 }
 
@@ -20,6 +21,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
   isMarket = false,
   isCheap: propIsCheap,
   isExpensive: propIsExpensive,
+  isLimitReached = false,
   onClick
 }) => {
 
@@ -41,7 +43,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
 
   return (
     <div
-      className={`good-item ${isCheap ? 'cheap' : ''} ${isExpensive ? 'exp' : ''} ${isMarket ? 'market' : 'inventory'}`}
+      className={`good-item ${isCheap ? 'cheap' : ''} ${isExpensive ? 'exp' : ''} ${isMarket ? 'market' : 'inventory'} ${isLimitReached ? 'limit-reached' : ''}`}
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >

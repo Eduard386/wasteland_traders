@@ -56,11 +56,40 @@ const CityScreen = () => {
     }, 0);
   };
 
+  // Проверка лимитов торговли
+  const tradeLimits = player.tradeLimits || { boughtItems: {}, soldItems: {}, lastCityId: player.cityId };
+
+  const canBuyItem = (goodId: GoodId, count: number) => {
+    const currentBought = tradeLimits.boughtItems?.[goodId] || 0;
+    const inTakeItems = takeItems[goodId] || 0;
+    return currentBought + inTakeItems + count <= 2;
+  };
+
+  const canSellItem = (goodId: GoodId, count: number) => {
+    const currentSold = tradeLimits.soldItems?.[goodId] || 0;
+    const inGiveItems = giveItems[goodId] || 0;
+    return currentSold + inGiveItems + count <= 2;
+  };
+
+  const isItemBoughtLimitReached = (goodId: GoodId) => {
+    const currentBought = tradeLimits.boughtItems?.[goodId] || 0;
+    const inTakeItems = takeItems[goodId] || 0;
+    return currentBought + inTakeItems >= 2;
+  };
+
+  const isItemSoldLimitReached = (goodId: GoodId) => {
+    const currentSold = tradeLimits.soldItems?.[goodId] || 0;
+    const inGiveItems = giveItems[goodId] || 0;
+    return currentSold + inGiveItems >= 2;
+  };
+
   const handleMarketItemClick = (goodId: GoodId) => {
-    setTakeItems(prev => ({
-      ...prev,
-      [goodId]: (prev[goodId] || 0) + 1
-    }));
+    if (canBuyItem(goodId, 1)) {
+      setTakeItems(prev => ({
+        ...prev,
+        [goodId]: (prev[goodId] || 0) + 1
+      }));
+    }
   };
 
   const handleTakeItemClick = (goodId: GoodId) => {
@@ -78,10 +107,12 @@ const CityScreen = () => {
   const handleInventoryItemClick = (goodId: GoodId) => {
     const available = getAvailableInventory();
     if (available[goodId] && available[goodId] > 0) {
-      setGiveItems(prev => ({
-        ...prev,
-        [goodId]: (prev[goodId] || 0) + 1
-      }));
+      if (canSellItem(goodId, 1)) {
+        setGiveItems(prev => ({
+          ...prev,
+          [goodId]: (prev[goodId] || 0) + 1
+        }));
+      }
     }
   };
 
@@ -103,6 +134,7 @@ const CityScreen = () => {
       const price = prices[goodId] || 2;
       const isCheap = price === 1;
       const isExpensive = price === 3;
+      const isLimitReached = isItemBoughtLimitReached(goodId);
 
       return (
         <GoodItem
@@ -113,7 +145,8 @@ const CityScreen = () => {
           isMarket={true}
           isCheap={isCheap}
           isExpensive={isExpensive}
-          onClick={() => handleMarketItemClick(goodId)}
+          isLimitReached={isLimitReached}
+          onClick={isLimitReached ? undefined : () => handleMarketItemClick(goodId)}
         />
       );
     });
@@ -123,18 +156,24 @@ const CityScreen = () => {
     const available = getAvailableInventory();
     return Object.entries(available)
       .filter(([, count]) => count > 0)
-      .map(([goodId, count]) => (
-        <GoodItem
-          key={goodId}
-          goodId={goodId as GoodId}
-          count={count}
-          price={prices[goodId as GoodId] || 2}
-          isMarket={false}
-          isCheap={false}
-          isExpensive={false}
-          onClick={() => handleInventoryItemClick(goodId as GoodId)}
-        />
-      ));
+      .map(([goodId, count]) => {
+        const goodIdTyped = goodId as GoodId;
+        const isLimitReached = isItemSoldLimitReached(goodIdTyped);
+
+        return (
+          <GoodItem
+            key={goodId}
+            goodId={goodIdTyped}
+            count={count}
+            price={prices[goodIdTyped] || 2}
+            isMarket={false}
+            isCheap={false}
+            isExpensive={false}
+            isLimitReached={isLimitReached}
+            onClick={isLimitReached ? undefined : () => handleInventoryItemClick(goodIdTyped)}
+          />
+        );
+      });
   };
 
   const renderTradeZone = (items: Record<GoodId, number>, onClickHandler: (goodId: GoodId) => void) => {
@@ -184,17 +223,21 @@ const CityScreen = () => {
         <div className="city-overlay">
           {/* Заголовок города */}
           <div className="city-header">
-            <h1 className="city-name">{currentCity.name}</h1>
-          </div>
-
-          {/* Кнопки действий */}
-          <div className="action-buttons">
-            <button
-              className="btn action-btn"
-              onClick={() => setScreen('map')}
-            >
-              World Map
-            </button>
+            <h1 className="city-name">{currentCity.name} (Day: {world.tick})</h1>
+            <div className="header-buttons">
+              <button
+                className="btn action-btn"
+                onClick={() => setScreen('map')}
+              >
+                Map
+              </button>
+              <button className="btn action-btn" onClick={doTick}>
+                Make Market Tick (2 cities)
+              </button>
+              <button className="btn action-btn">
+                Copy Game Link
+              </button>
+            </div>
           </div>
 
           {/* Market Goods (Top Row) */}
@@ -236,20 +279,7 @@ const CityScreen = () => {
             </div>
           </div>
 
-          {/* HUD */}
-          <div className="hud">
-            <div className="hud-item">
-              <button className="btn" onClick={doTick}>
-                Make Market Tick (2 cities)
-              </button>
-              <span className="tick-info">Tick: {world.tick}</span>
-            </div>
-            <div className="hud-item">
-              <button className="btn">
-                Copy Game Link
-              </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

@@ -34,16 +34,19 @@
 .city-name {
   margin: 0;
   color: #f8f9fa;
-  font-size: 2.5rem;
+  font-size: 3rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.action-buttons {
+.header-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
+
+
 
 .action-btn {
   background: #17a2b8;
@@ -179,25 +182,21 @@
   background: #218838;
 }
 
-/* HUD */
-.hud {
-  margin-top: auto;
+
+
+.trade-limits-info {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-top: 2px solid #495057;
+  justify-content: space-around;
+  margin-top: 10px;
+  gap: 20px;
 }
 
-.hud-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.tick-info {
+.trade-limits-info span {
   color: #f8f9fa;
-  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
 
 /* Мобильная адаптация */
@@ -207,12 +206,13 @@
   }
 
   .city-name {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
 
-  .action-buttons {
+  .header-buttons {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   .trade-zones {
@@ -240,9 +240,10 @@
     min-width: auto;
   }
 
-  .hud {
+
+
+  .trade-limits-info {
     flex-direction: column;
-    gap: 15px;
-    text-align: center;
+    gap: 10px;
   }
 }

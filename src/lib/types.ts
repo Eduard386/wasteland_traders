@@ -3,7 +3,7 @@ export type GoodId = "water" | "food" | "fuel" | "ammo" | "scrap" | "medicine";
 
 export const GOODS: Record<GoodId, string> = {
   water: "Water",
-  food: "Food", 
+  food: "Food",
   fuel: "Fuel",
   ammo: "Ammo",
   scrap: "Scrap",
@@ -47,6 +47,11 @@ export type Inventory = Partial<Record<GoodId, number>>;
 export interface Player {
   cityId: string;
   inv: Inventory;
+  tradeLimits?: {
+    boughtItems: Partial<Record<GoodId, number>>;  // how many of each item bought in current city
+    soldItems: Partial<Record<GoodId, number>>;    // how many of each item sold in current city
+    lastCityId: string;                             // last city where trade occurred
+  };
 }
 
 // Мир демо
