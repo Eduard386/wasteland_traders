@@ -2,9 +2,9 @@
 // В разработке использует относительные пути, в продакшене - абсолютные
 
 export const getAssetPath = (path: string): string => {
-  // В продакшене (GitHub Pages) используем абсолютные пути
+  // В продакшене (GitHub Pages) используем пути с именем репозитория
   if (import.meta.env.PROD) {
-    return `/assets/${path}`;
+    return `/wasteland_traders/assets/${path}`;
   }
   // В разработке используем относительные пути
   return `./assets/${path}`;
