@@ -88,7 +88,7 @@
   bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: auto;
+  width: fit-content;
   z-index: 10;
   margin: 0;
   display: flex;
@@ -108,15 +108,18 @@
 
 /* Специальные стили для инвентаря */
 .inventory-section .items-row {
-  min-height: 140px !important;
+  min-height: 160px !important;
   height: auto !important;
   width: fit-content !important;
-  min-width: 150px !important;
-  padding: 20px !important;
+  min-width: 200px !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
   justify-content: center !important;
   align-items: center !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
   gap: 15px !important;
+  overflow-x: auto !important;
 }
 
 .items-row {
@@ -126,12 +129,13 @@
   padding: 20px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
-  min-height: 140px;
+  min-height: 160px;
   justify-content: center;
   align-items: center;
   width: fit-content;
   margin: 0 auto;
   min-width: 200px;
+  max-width: fit-content;
 }
 
 .items-row:empty {
@@ -170,17 +174,23 @@
   min-height: 100px;
   border: none;
   border-radius: 8px;
-  padding: 8px;
+  padding: 20px;
   margin: 8px;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.3);
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 /* Уменьшенная ширина для секций с малым количеством товаров */
-.trade-zone:empty,
-.trade-zone:has(> div:only-child) {
+.trade-zone:empty {
   min-width: 120px;
   width: fit-content;
+  background: transparent;
+  padding: 0;
 }
 
 .trade-summary {
@@ -227,8 +237,69 @@
   border-radius: 4px;
 }
 
-/* Мобильная адаптация */
-@media (max-width: 768px) {
+/* Респонсивный дизайн для всех устройств */
+
+/* Мобильные устройства (до 480px) */
+@media (max-width: 480px) {
+  .city-overlay {
+    padding: 10px;
+  }
+
+  .city-name {
+    font-size: 2rem;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .trade-zones {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .trade-zone {
+    min-width: auto;
+  }
+
+  .trade-summary {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .items-row {
+    width: 95%;
+    min-width: auto;
+    gap: 8px;
+    padding: 12px;
+    min-height: 100px;
+  }
+
+  .inventory-section .items-row {
+    gap: 8px !important;
+    padding: 12px !important;
+    min-height: 100px !important;
+  }
+
+  .inventory-section {
+    bottom: 8% !important;
+  }
+
+  .trade-limits-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Планшеты и большие мобильные (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
   .city-overlay {
     padding: 15px;
   }
@@ -245,6 +316,7 @@
 
   .trade-zones {
     flex-direction: column;
+    gap: 25px;
   }
 
   .trade-zone {
@@ -254,24 +326,251 @@
   .trade-summary {
     flex-direction: column;
     gap: 10px;
-    text-align: center;
-  }
-
-  .trade-values {
-    flex-direction: column;
-    gap: 5px;
   }
 
   .items-row {
-    justify-content: center;
     width: 90%;
     min-width: auto;
+    gap: 12px;
+    padding: 15px;
+    min-height: 120px;
   }
 
+  .inventory-section .items-row {
+    gap: 12px !important;
+    padding: 15px !important;
+    min-height: 120px !important;
+  }
 
+  .inventory-section {
+    bottom: 10% !important;
+  }
 
   .trade-limits-info {
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+/* iPad и планшеты (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .city-overlay {
+    padding: 20px;
+  }
+
+  .city-name {
+    font-size: 2.8rem;
+  }
+
+  .header-buttons {
+    gap: 20px;
+  }
+
+  .action-btn {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+  }
+
+  .trade-zones {
+    gap: 30px;
+  }
+
+  .items-row {
+    width: 85%;
+    min-width: auto;
+    gap: 15px;
+    padding: 18px;
+    min-height: 130px;
+  }
+
+  .inventory-section .items-row {
+    width: 85% !important;
+    min-width: auto !important;
+    gap: 15px !important;
+    padding: 18px !important;
+    min-height: 130px !important;
+  }
+
+  .inventory-section {
+    bottom: 12% !important;
+  }
+}
+
+/* Малые десктопы (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .city-overlay {
+    padding: 25px;
+  }
+
+  .city-name {
+    font-size: 3rem;
+  }
+
+  .header-buttons {
+    gap: 25px;
+  }
+
+  .action-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+  }
+
+  .trade-zones {
+    gap: 35px;
+  }
+
+  .items-row {
+    width: 80%;
+    gap: 18px;
+    padding: 20px;
+    min-height: 140px;
+  }
+
+  .inventory-section .items-row {
+    gap: 18px !important;
+    padding: 20px !important;
+    min-height: 140px !important;
+  }
+
+  .inventory-section {
+    bottom: 15% !important;
+  }
+}
+
+/* Большие десктопы (1367px и больше) */
+@media (min-width: 1367px) {
+  .city-overlay {
+    padding: 30px;
+  }
+
+  .city-name {
+    font-size: 3.5rem;
+  }
+
+  .header-buttons {
+    gap: 30px;
+  }
+
+  .action-btn {
+    padding: 16px 32px;
+    font-size: 1.3rem;
+  }
+
+  .trade-zones {
+    gap: 40px;
+  }
+
+  .items-row {
+    width: 75%;
+    gap: 20px;
+    padding: 25px;
+    min-height: 150px;
+  }
+
+  .inventory-section .items-row {
+    gap: 20px !important;
+    padding: 25px !important;
+    min-height: 150px !important;
+  }
+
+  .inventory-section {
+    bottom: 18% !important;
+  }
+}
+
+/* Ландшафтная ориентация для мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .city-overlay {
+    padding: 10px;
+  }
+
+  .city-name {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .header-buttons {
+    flex-direction: row;
+    gap: 15px;
+  }
+
+  .trade-zones {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .inventory-section {
+    bottom: 5% !important;
+  }
+
+  .items-row {
+    min-height: 80px;
+  }
+
+  .inventory-section .items-row {
+    min-height: 80px !important;
+  }
+}
+
+/* iPad в ландшафтном режиме */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+  .city-overlay {
+    padding: 15px;
+  }
+
+  .city-name {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+  }
+
+  .header-buttons {
+    gap: 20px;
+  }
+
+  .trade-zones {
+    gap: 25px;
+    margin: 15px 0;
+  }
+
+  .trade-summary {
+    margin: 15px auto;
+  }
+
+  .inventory-section {
+    bottom: 12% !important;
+  }
+
+  .items-row {
+    min-height: 90px;
+    padding: 15px;
+  }
+
+  .inventory-section .items-row {
+    min-height: 90px !important;
+    padding: 15px !important;
+  }
+
+  /* Увеличиваем отступ между кнопкой Barter и Your Goods */
+  .trade-summary {
+    margin-bottom: 35px !important;
+  }
+
+  .inventory-section h3 {
+    margin-top: 15px !important;
+  }
+}
+
+/* iPad Mini в ландшафтном режиме */
+@media (min-width: 769px) and (max-width: 820px) and (orientation: landscape) {
+  .inventory-section {
+    bottom: 15% !important;
+  }
+
+  .trade-summary {
+    margin-bottom: 40px !important;
+  }
+
+  .inventory-section h3 {
+    margin-top: 20px !important;
   }
 }

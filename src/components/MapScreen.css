@@ -315,13 +315,58 @@
 
 
 
-/* Мобильная адаптация */
-@media (max-width: 768px) {
+/* Респонсивный дизайн для карты */
+
+/* Мобильные устройства (до 480px) */
+@media (max-width: 480px) {
+    .map-content {
+        padding: 10px;
+    }
+
+    .city-icon img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .city-name {
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+    .city-goods {
+        top: -60px;
+        gap: 2px;
+    }
+
+    .good-indicator {
+        width: 60px;
+        height: 60px;
+    }
+
+    .good-name {
+        font-size: 8px;
+        bottom: -15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 0;
+    }
+
+    .route-info-popup {
+        font-size: 9px;
+        padding: 5px 8px;
+        margin-left: 10px;
+    }
+}
+
+/* Планшеты и большие мобильные (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
     .map-content {
         padding: 15px;
     }
-
-
 
     .city-icon img {
         width: 60px;
@@ -350,10 +395,173 @@
     .action-buttons {
         flex-direction: column;
         align-items: center;
+        gap: 15px;
+        padding: 20px 0;
     }
 
     .route-info-popup {
         font-size: 10px;
         padding: 6px 10px;
+    }
+}
+
+/* iPad и планшеты (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .map-content {
+        padding: 20px;
+    }
+
+    .city-icon img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .city-name {
+        font-size: 13px;
+    }
+
+    .city-goods {
+        top: -80px;
+        gap: 3px;
+    }
+
+    .good-indicator {
+        width: 75px;
+        height: 75px;
+    }
+
+    .good-name {
+        font-size: 11px;
+        bottom: -20px;
+    }
+
+    .action-buttons {
+        gap: 25px;
+        padding: 25px 0;
+    }
+
+    .route-info-popup {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+}
+
+/* Малые десктопы (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .map-content {
+        padding: 25px;
+    }
+
+    .city-icon img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .city-name {
+        font-size: 14px;
+    }
+
+    .city-goods {
+        top: -90px;
+        gap: 4px;
+    }
+
+    .good-indicator {
+        width: 80px;
+        height: 80px;
+    }
+
+    .good-name {
+        font-size: 12px;
+        bottom: -20px;
+    }
+
+    .action-buttons {
+        gap: 30px;
+        padding: 30px 0;
+    }
+
+    .route-info-popup {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+/* Большие десктопы (1367px и больше) */
+@media (min-width: 1367px) {
+    .map-content {
+        padding: 30px;
+    }
+
+    .city-icon img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .city-name {
+        font-size: 16px;
+    }
+
+    .city-goods {
+        top: -100px;
+        gap: 5px;
+    }
+
+    .good-indicator {
+        width: 90px;
+        height: 90px;
+    }
+
+    .good-name {
+        font-size: 14px;
+        bottom: -25px;
+    }
+
+    .action-buttons {
+        gap: 35px;
+        padding: 35px 0;
+    }
+
+    .route-info-popup {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+
+/* Ландшафтная ориентация для мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+    .map-content {
+        padding: 10px;
+    }
+
+    .city-icon img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .city-name {
+        font-size: 9px;
+        margin-top: 2px;
+    }
+
+    .city-goods {
+        top: -50px;
+        gap: 1px;
+    }
+
+    .good-indicator {
+        width: 50px;
+        height: 50px;
+    }
+
+    .good-name {
+        font-size: 7px;
+        bottom: -12px;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+        gap: 15px;
+        padding: 10px 0;
     }
 }

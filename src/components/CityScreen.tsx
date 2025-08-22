@@ -189,26 +189,24 @@ const CityScreen = () => {
   const renderTradeZone = (items: Record<GoodId, number>, onClickHandler: (goodId: GoodId) => void) => {
     return (
       <div className="trade-zone">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-          {Object.entries(items).map(([goodId, count]) => {
-            const price = prices[goodId as GoodId] || 2;
-            const isCheap = price === 1;
-            const isExpensive = price === 4;
+        {Object.entries(items).map(([goodId, count]) => {
+          const price = prices[goodId as GoodId] || 2;
+          const isCheap = price === 1;
+          const isExpensive = price === 4;
 
-            return (
-              <GoodItem
-                key={goodId}
-                goodId={goodId as GoodId}
-                count={count}
-                price={price}
-                isMarket={false}
-                isCheap={isCheap}
-                isExpensive={isExpensive}
-                onClick={() => onClickHandler(goodId as GoodId)}
-              />
-            );
-          })}
-        </div>
+          return (
+            <GoodItem
+              key={goodId}
+              goodId={goodId as GoodId}
+              count={count}
+              price={price}
+              isMarket={false}
+              isCheap={isCheap}
+              isExpensive={isExpensive}
+              onClick={() => onClickHandler(goodId as GoodId)}
+            />
+          );
+        })}
       </div>
     );
   };
