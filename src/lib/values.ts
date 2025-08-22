@@ -1,9 +1,9 @@
 import type { GoodId, CityMarket, Inventory } from './types';
 
 // Расчет цены товара в городе
-export function priceOf(g: GoodId, market: CityMarket): 1 | 2 | 3 {
+export function priceOf(g: GoodId, market: CityMarket): 1 | 2 | 4 {
   if (market.cheap?.includes(g)) return 1;
-  if (market.exp?.includes(g)) return 3;
+  if (market.exp?.includes(g)) return 4;
   return 2;
 }
 
@@ -22,8 +22,8 @@ export function guardCost(routeValue: number, length: number, risk: number, k = 
 }
 
 // Получение всех цен товаров в городе
-export function getAllPrices(market: CityMarket): Record<GoodId, 1 | 2 | 3> {
-  const prices: Record<GoodId, 1 | 2 | 3> = {
+export function getAllPrices(market: CityMarket): Record<GoodId, 1 | 2 | 4> {
+  const prices: Record<GoodId, 1 | 2 | 4> = {
     water: 2,
     food: 2,
     fuel: 2,
@@ -42,7 +42,7 @@ export function getAllPrices(market: CityMarket): Record<GoodId, 1 | 2 | 3> {
   // Применяем дорогие товары
   if (market.exp) {
     for (const good of market.exp) {
-      prices[good] = 3;
+      prices[good] = 4;
     }
   }
 

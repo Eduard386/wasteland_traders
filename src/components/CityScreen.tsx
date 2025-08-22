@@ -14,7 +14,7 @@ const CityScreen = () => {
 
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const currentCityState = world.cityStates[player.cityId];
-  const prices: Record<GoodId, 1 | 2 | 3> = currentCityState ? getAllPrices(currentCityState.market) : {
+  const prices: Record<GoodId, 1 | 2 | 4> = currentCityState ? getAllPrices(currentCityState.market) : {
     water: 2,
     food: 2,
     fuel: 2,
@@ -128,7 +128,7 @@ const CityScreen = () => {
     return goods.map(goodId => {
       const price = prices[goodId] || 2;
       const isCheap = price === 1;
-      const isExpensive = price === 3;
+      const isExpensive = price === 4;
       const isLimitReached = isItemBoughtLimitReached(goodId);
 
       return (
@@ -153,6 +153,9 @@ const CityScreen = () => {
       .filter(([, count]) => count > 0)
       .map(([goodId, count]) => {
         const goodIdTyped = goodId as GoodId;
+        const price = prices[goodIdTyped] || 2;
+        const isCheap = price === 1;
+        const isExpensive = price === 4;
         const isLimitReached = isItemSoldLimitReached(goodIdTyped);
 
         return (
@@ -160,10 +163,10 @@ const CityScreen = () => {
             key={goodId}
             goodId={goodIdTyped}
             count={count}
-            price={prices[goodIdTyped] || 2}
+            price={price}
             isMarket={false}
-            isCheap={false}
-            isExpensive={false}
+            isCheap={isCheap}
+            isExpensive={isExpensive}
             isLimitReached={isLimitReached}
             onClick={isLimitReached ? undefined : () => handleInventoryItemClick(goodIdTyped)}
           />
@@ -178,7 +181,7 @@ const CityScreen = () => {
           {Object.entries(items).map(([goodId, count]) => {
             const price = prices[goodId as GoodId] || 2;
             const isCheap = price === 1;
-            const isExpensive = price === 3;
+            const isExpensive = price === 4;
 
             return (
               <GoodItem

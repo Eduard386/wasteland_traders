@@ -39,7 +39,7 @@ const GoodItem: React.FC<GoodItemProps> = ({
   };
 
   const isCheap = propIsCheap !== undefined ? propIsCheap : price === 1;
-  const isExpensive = propIsExpensive !== undefined ? propIsExpensive : price === 3;
+  const isExpensive = propIsExpensive !== undefined ? propIsExpensive : price === 4;
 
   return (
     <div
