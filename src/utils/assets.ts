@@ -50,3 +50,8 @@ export const getTravelImage = (): string => {
   const version = 'v2';
   return getAssetPath(`travel.png?v=${version}`);
 };
+
+export const getRobbedImage = (): string => {
+  const version = 'v1';
+  return getAssetPath(`robbed.png?v=${version}`);
+};

@@ -9,10 +9,13 @@ interface GameState {
   // Состояние
   world: World;
   player: Player;
-  currentScreen: 'city' | 'map' | 'guards' | 'travel';
+  currentScreen: 'city' | 'map' | 'guards' | 'travel' | 'robbed';
   selectedCityId: string | null;
   isTraveling: boolean;
   travelToCityId: string | null;
+  isRobbed: boolean;
+  robbedItems: Partial<Record<GoodId, number>>;
+  robberyTargetCityId: string | null;
 
   // Экшены
   canSpendResource: () => boolean;
@@ -23,10 +26,12 @@ interface GameState {
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   travel: (toCityId: string) => boolean;
   travelWithGuards: (toCityId: string, paymentItems: Partial<Record<GoodId, number>>) => boolean;
-  setScreen: (screen: 'city' | 'map' | 'guards' | 'travel') => void;
+  setScreen: (screen: 'city' | 'map' | 'guards' | 'travel' | 'robbed') => void;
   setSelectedCity: (cityId: string | null) => void;
   startTravel: (toCityId: string) => void;
   completeTravel: () => void;
+  startRobbery: (stolenItems: Partial<Record<GoodId, number>>) => void;
+  completeRobbery: () => void;
   initializeGame: (seed?: number) => void;
 }
 
@@ -104,6 +109,9 @@ export const useGameStore = create<GameState>()(
       selectedCityId: null,
       isTraveling: false,
       travelToCityId: null,
+      isRobbed: false,
+      robbedItems: {},
+      robberyTargetCityId: null,
 
       // Инициализация игры
       initializeGame: (seed?: number) => {
@@ -542,7 +550,7 @@ export const useGameStore = create<GameState>()(
       },
 
       // Смена экрана
-      setScreen: (screen: 'city' | 'map' | 'guards' | 'travel') => {
+      setScreen: (screen: 'city' | 'map' | 'guards' | 'travel' | 'robbed') => {
         set({ currentScreen: screen });
       },
 
@@ -562,16 +570,264 @@ export const useGameStore = create<GameState>()(
 
       // Завершить путешествие
       completeTravel: () => {
-        const { travelToCityId } = get();
+        const { travelToCityId, world, player } = get();
         if (travelToCityId) {
-          // Выполняем фактическое путешествие
-          get().travel(travelToCityId);
+          // 50% шанс ограбления
+          const rng = createRNG(world.seed, world.tick, 'robbery');
+          const isRobbed = rng.next() < 0.5;
+
+          if (isRobbed) {
+            // Рассчитываем украденные товары
+            const currentCityState = world.cityStates[player.cityId];
+            if (currentCityState) {
+              const prices = getAllPrices(currentCityState.market);
+              
+              // Рассчитываем общую стоимость инвентаря (за вычетом потраченной еды/воды)
+              const invAfterTravel = { ...player.inv };
+              const hasWater = (invAfterTravel['water'] || 0) > 0;
+              const hasFood = (invAfterTravel['food'] || 0) > 0;
+              
+              if (hasWater && hasFood) {
+                // Случайно выбираем что потратить
+                if (rng.next() < 0.5) {
+                  invAfterTravel['water'] = (invAfterTravel['water'] || 0) - 1;
+                  if ((invAfterTravel['water'] || 0) <= 0) delete invAfterTravel['water'];
+                } else {
+                  invAfterTravel['food'] = (invAfterTravel['food'] || 0) - 1;
+                  if ((invAfterTravel['food'] || 0) <= 0) delete invAfterTravel['food'];
+                }
+              } else if (hasWater) {
+                invAfterTravel['water'] = (invAfterTravel['water'] || 0) - 1;
+                if ((invAfterTravel['water'] || 0) <= 0) delete invAfterTravel['water'];
+              } else if (hasFood) {
+                invAfterTravel['food'] = (invAfterTravel['food'] || 0) - 1;
+                if ((invAfterTravel['food'] || 0) <= 0) delete invAfterTravel['food'];
+              }
+
+              // Рассчитываем общую стоимость
+              const totalValue = Object.entries(invAfterTravel).reduce((total, [goodId, count]) => {
+                return total + (count * (prices[goodId as GoodId] || 2));
+              }, 0);
+
+              // Игрок теряет 2/3 стоимости
+              const stolenValue = Math.floor(totalValue * 2 / 3);
+
+              // Рассчитываем какие товары украсть
+              const stolenItems: Partial<Record<GoodId, number>> = {};
+              let currentStolenValue = 0;
+
+              // Сортируем товары по цене (от дорогих к дешевым)
+              const sortedItems = Object.entries(invAfterTravel)
+                .map(([goodId, count]) => ({ goodId: goodId as GoodId, count, price: prices[goodId as GoodId] }))
+                .sort((a, b) => b.price - a.price);
+
+              // Если у игрока остается только 1 товар и его стоимость меньше 2, то крадем его полностью
+              if (sortedItems.length === 1 && sortedItems[0].count === 1 && sortedItems[0].price < 2) {
+                stolenItems[sortedItems[0].goodId] = 1;
+              } else {
+                // Обычная логика ограбления
+                for (const item of sortedItems) {
+                  if (currentStolenValue >= stolenValue) break;
+
+                  const remainingValue = stolenValue - currentStolenValue;
+                  let maxItemsNeeded = Math.floor(remainingValue / item.price);
+                  
+                  // Если у игрока всего 1 товар и нужно украсть что-то, берем этот товар
+                  if (sortedItems.length === 1 && item.count === 1 && maxItemsNeeded === 0) {
+                    maxItemsNeeded = 1;
+                  }
+                  
+                  const itemsToTake = Math.min(maxItemsNeeded, item.count);
+
+                  if (itemsToTake > 0) {
+                    stolenItems[item.goodId] = itemsToTake;
+                    currentStolenValue += itemsToTake * item.price;
+                  }
+                }
+              }
+
+              // Определяем какой ресурс потратим на путешествие
+              let resourceToSpend: 'water' | 'food' | null = null;
+              if (hasWater && hasFood) {
+                // Случайно выбираем что потратить
+                resourceToSpend = rng.next() < 0.5 ? 'water' : 'food';
+              } else if (hasWater) {
+                resourceToSpend = 'water';
+              } else if (hasFood) {
+                resourceToSpend = 'food';
+              }
+
+              // Обновляем invAfterTravel с учетом потраченного ресурса
+              if (resourceToSpend) {
+                invAfterTravel[resourceToSpend] = (invAfterTravel[resourceToSpend] || 0) - 1;
+                if ((invAfterTravel[resourceToSpend] || 0) <= 0) {
+                  delete invAfterTravel[resourceToSpend];
+                }
+              }
+
+              // Отладочная информация
+              console.log('completeTravel - stolenItems:', stolenItems);
+              console.log('completeTravel - invAfterTravel:', invAfterTravel);
+              console.log('completeTravel - totalValue:', totalValue);
+              console.log('completeTravel - stolenValue:', stolenValue);
+
+              // Начинаем ограбление
+              get().startRobbery(stolenItems);
+            }
+          } else {
+            // Безопасное путешествие
+            get().travel(travelToCityId);
+          }
+
           set({
             isTraveling: false,
-            travelToCityId: null,
-            currentScreen: 'city'
+            travelToCityId: null
           });
         }
+      },
+
+      // Начать ограбление
+      startRobbery: (stolenItems: Partial<Record<GoodId, number>>) => {
+        const { travelToCityId } = get();
+        set({
+          isRobbed: true,
+          robbedItems: stolenItems,
+          robberyTargetCityId: travelToCityId,
+          currentScreen: 'robbed'
+        });
+      },
+
+      // Завершить ограбление
+      completeRobbery: () => {
+        const { robbedItems, player, world, robberyTargetCityId } = get();
+        
+        // Удаляем украденные товары из инвентаря
+        const newInv = { ...player.inv };
+        Object.entries(robbedItems).forEach(([goodId, count]) => {
+          const good = goodId as GoodId;
+          if (newInv[good]) {
+            newInv[good] = (newInv[good] || 0) - count;
+            if ((newInv[good] || 0) <= 0) {
+              delete newInv[good];
+            }
+          }
+        });
+
+        // Определяем целевой город (куда игрок направлялся)
+        const targetCityId = robberyTargetCityId || player.cityId;
+
+        // Выполняем фактическое путешествие (тратим ресурсы и перемещаемся)
+        const hasWater = (newInv['water'] || 0) > 0;
+        const hasFood = (newInv['food'] || 0) > 0;
+        
+        // Тратим ресурсы на путешествие
+        if (hasWater && hasFood) {
+          // Случайно выбираем что потратить
+          const rng = createRNG(world.seed, world.tick, 'travel');
+          if (rng.next() < 0.5) {
+            newInv['water'] = (newInv['water'] || 0) - 1;
+            if ((newInv['water'] || 0) <= 0) delete newInv['water'];
+          } else {
+            newInv['food'] = (newInv['food'] || 0) - 1;
+            if ((newInv['food'] || 0) <= 0) delete newInv['food'];
+          }
+        } else if (hasWater) {
+          newInv['water'] = (newInv['water'] || 0) - 1;
+          if ((newInv['water'] || 0) <= 0) delete newInv['water'];
+        } else if (hasFood) {
+          newInv['food'] = (newInv['food'] || 0) - 1;
+          if ((newInv['food'] || 0) <= 0) delete newInv['food'];
+        }
+
+        // Проверяем банкротство после ограбления
+        const updatedPlayer = { 
+          ...player, 
+          inv: newInv,
+          cityId: targetCityId, // Перемещаем в целевой город
+          tradeLimits: {
+            boughtItems: {},
+            soldItems: {},
+            lastCityId: targetCityId
+          }
+        };
+        
+        // Проверяем, есть ли хоть что-то в инвентаре
+        if (Object.keys(newInv).length === 0 || Object.values(newInv).every(count => count <= 0)) {
+          // Банкротство - показываем экран банкротства
+          set({
+            isRobbed: false,
+            robbedItems: {},
+            robberyTargetCityId: null,
+            player: updatedPlayer,
+            currentScreen: 'city'
+          });
+          return;
+        }
+
+        // Отладочная информация для банкротства
+        console.log('completeRobbery - newInv after robbery:', newInv);
+        console.log('completeRobbery - remaining items:', Object.entries(newInv).filter(([, count]) => count > 0));
+
+        // Проверяем, может ли игрок продолжать торговлю в целевом городе
+        const targetCityState = world.cityStates[targetCityId];
+        if (targetCityState) {
+          const prices = getAllPrices(targetCityState.market);
+          const waterPrice = prices['water'];
+          const foodPrice = prices['food'];
+
+          // Если у игрока остался только 1 товар, и он дешевый (стоимость 1)
+          // и при этом цена воды больше 1, и цена еды больше 1
+          const remainingItems = Object.entries(newInv).filter(([, count]) => count > 0);
+          
+          if (remainingItems.length === 1) {
+            const [onlyGoodId, onlyCount] = remainingItems[0];
+            const onlyGood = onlyGoodId as GoodId;
+            const onlyGoodPrice = prices[onlyGood];
+            
+            if (onlyCount === 1 && onlyGoodPrice === 1 && waterPrice > 1 && foodPrice > 1) {
+              // Банкротство - показываем экран банкротства
+              set({
+                isRobbed: false,
+                robbedItems: {},
+                robberyTargetCityId: null,
+                player: updatedPlayer,
+                currentScreen: 'city'
+              });
+              return;
+            }
+          }
+
+          // Дополнительная проверка: если у игрока остался только 1 товар (любой)
+          // и он не может купить воду или еду (стоимость больше 1)
+          if (remainingItems.length === 1) {
+            const [, onlyCount] = remainingItems[0];
+            
+            console.log('completeRobbery - checking bankruptcy: onlyCount =', onlyCount, 'waterPrice =', waterPrice, 'foodPrice =', foodPrice);
+            
+            // Если у игрока только 1 товар и он не может купить воду или еду
+            if (onlyCount === 1 && waterPrice > 1 && foodPrice > 1) {
+              console.log('completeRobbery - BANKRUPTCY DETECTED!');
+              // Банкротство - показываем экран банкротства
+              set({
+                isRobbed: false,
+                robbedItems: {},
+                robberyTargetCityId: null,
+                player: updatedPlayer,
+                currentScreen: 'city'
+              });
+              return;
+            }
+          }
+        }
+
+        // Нормальное завершение - переходим в целевой город
+        set({
+          isRobbed: false,
+          robbedItems: {},
+          robberyTargetCityId: null,
+          player: updatedPlayer,
+          currentScreen: 'city'
+        });
       }
     }),
     {

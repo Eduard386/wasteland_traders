@@ -5,10 +5,11 @@ import MapScreen from './components/MapScreen';
 import BankruptcyScreen from './components/BankruptcyScreen';
 import GuardsScreen from './components/GuardsScreen';
 import TravelScreen from './components/TravelScreen';
+import RobbedScreen from './components/RobbedScreen';
 import './App.css';
 
 function App() {
-  const { world, initializeGame, currentScreen, isBankrupt, selectedCityId } = useGameStore();
+  const { world, initializeGame, currentScreen, isBankrupt, selectedCityId, robbedItems } = useGameStore();
 
   // Инициализация игры при первом запуске
   useEffect(() => {
@@ -51,6 +52,16 @@ function App() {
             onComplete={() => {
               const { completeTravel } = useGameStore.getState();
               completeTravel();
+            }}
+          />
+        );
+      case 'robbed':
+        return (
+          <RobbedScreen
+            stolenItems={robbedItems}
+            onComplete={() => {
+              const { completeRobbery } = useGameStore.getState();
+              completeRobbery();
             }}
           />
         );

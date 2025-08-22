@@ -251,6 +251,11 @@ const CityScreen = () => {
   const tradeLimitsOk = canExecuteTrade();
   const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0 && tradeLimitsOk;
 
+  // Проверяем наличие ресурсов для действий
+  const hasWater = (player.inv['water'] || 0) > 0;
+  const hasFood = (player.inv['food'] || 0) > 0;
+  const hasResources = hasWater || hasFood;
+
   return (
     <div
       className="city-screen"
@@ -280,13 +285,19 @@ const CityScreen = () => {
                 Map
               </button>
               <button
-                className="btn action-btn"
+                className={`btn action-btn ${!hasResources ? 'disabled' : ''}`}
+                disabled={!hasResources}
                 onClick={() => {
-                  setOpacity(0);
-                  setTimeout(() => {
-                    doTick();
-                    setOpacity(1);
-                  }, 1000);
+                  if (hasResources) {
+                    setOpacity(0);
+                    setTimeout(() => {
+                      doTick();
+                      // Очищаем секции Give и Take после тика
+                      setGiveItems({} as Record<GoodId, number>);
+                      setTakeItems({} as Record<GoodId, number>);
+                      setOpacity(1);
+                    }, 1000);
+                  }
                 }}
               >
                 Wait (1 water or 1 food)
