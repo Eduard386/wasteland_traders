@@ -43,12 +43,7 @@ const CityScreen = () => {
     return available;
   };
 
-  const handleTrade = () => {
-    if (executeTrade(giveItems, takeItems)) {
-      setGiveItems({} as Record<GoodId, number>);
-      setTakeItems({} as Record<GoodId, number>);
-    }
-  };
+
 
   const calculateValue = (items: Record<GoodId, number>) => {
     return Object.entries(items).reduce((total, [good, count]) => {
@@ -62,25 +57,25 @@ const CityScreen = () => {
   const canBuyItem = (goodId: GoodId, count: number) => {
     const currentBought = tradeLimits.boughtItems?.[goodId] || 0;
     const inTakeItems = takeItems[goodId] || 0;
-    return currentBought + inTakeItems + count <= 2;
+    return currentBought + inTakeItems + count <= 4;
   };
 
   const canSellItem = (goodId: GoodId, count: number) => {
     const currentSold = tradeLimits.soldItems?.[goodId] || 0;
     const inGiveItems = giveItems[goodId] || 0;
-    return currentSold + inGiveItems + count <= 2;
+    return currentSold + inGiveItems + count <= 4;
   };
 
   const isItemBoughtLimitReached = (goodId: GoodId) => {
     const currentBought = tradeLimits.boughtItems?.[goodId] || 0;
     const inTakeItems = takeItems[goodId] || 0;
-    return currentBought + inTakeItems >= 2;
+    return currentBought + inTakeItems >= 4;
   };
 
   const isItemSoldLimitReached = (goodId: GoodId) => {
     const currentSold = tradeLimits.soldItems?.[goodId] || 0;
     const inGiveItems = giveItems[goodId] || 0;
-    return currentSold + inGiveItems >= 2;
+    return currentSold + inGiveItems >= 4;
   };
 
   const handleMarketItemClick = (goodId: GoodId) => {
@@ -209,12 +204,37 @@ const CityScreen = () => {
 
   const giveValue = calculateValue(giveItems);
   const takeValue = calculateValue(takeItems);
-  const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0;
 
-  // Проверяем наличие ресурсов для действий
-  const hasWater = (player.inv['water'] || 0) > 0;
-  const hasFood = (player.inv['food'] || 0) > 0;
-  const hasResources = hasWater || hasFood;
+  // Проверяем лимиты торговли
+  const canExecuteTrade = () => {
+    // Проверяем лимиты покупки - только для товаров в takeItems
+    for (const [goodId, count] of Object.entries(takeItems)) {
+      const currentBought = tradeLimits.boughtItems?.[goodId as GoodId] || 0;
+      if (currentBought + count > 4) {
+        return false;
+      }
+    }
+
+    // Проверяем лимиты продажи - только для товаров в giveItems
+    for (const [goodId, count] of Object.entries(giveItems)) {
+      const currentSold = tradeLimits.soldItems?.[goodId as GoodId] || 0;
+      if (currentSold + count > 4) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleTrade = () => {
+    if (canExecuteTrade() && executeTrade(giveItems, takeItems)) {
+      setGiveItems({} as Record<GoodId, number>);
+      setTakeItems({} as Record<GoodId, number>);
+    }
+  };
+
+  const tradeLimitsOk = canExecuteTrade();
+  const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0 && tradeLimitsOk;
 
   return (
     <div className="city-screen">
@@ -236,12 +256,8 @@ const CityScreen = () => {
               >
                 Map
               </button>
-              <button
-                className={`btn action-btn ${!hasResources ? 'disabled' : ''}`}
-                onClick={doTick}
-                disabled={!hasResources}
-              >
-                Next Day (1 water or 1 food)
+              <button className="btn action-btn" onClick={doTick}>
+                Make Market Tick (2 cities)
               </button>
               <button className="btn action-btn">
                 Copy Game Link
@@ -274,7 +290,7 @@ const CityScreen = () => {
             <button
               className="btn trade-btn"
               onClick={handleTrade}
-              disabled={!isValidTrade || giveValue === 0}
+              disabled={!isValidTrade}
             >
               Barter
             </button>

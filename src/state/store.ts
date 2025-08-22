@@ -287,7 +287,7 @@ export const useGameStore = create<GameState>()(
         return true;
       },
 
-      // Предложение сделки
+            // Предложение сделки
       proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => {
         const { world, player } = get();
         const currentCity = world.cityStates[player.cityId];
@@ -295,9 +295,11 @@ export const useGameStore = create<GameState>()(
 
         const prices = getAllPrices(currentCity.market);
 
-        // Проверяем лимит ≤3 единиц одного товара
+        // Проверяем лимит ≤4 единиц одного товара
         for (const [, count] of Object.entries(take)) {
-          if (count > 3) return false;
+          if (count > 4) {
+            return false;
+          }
         }
 
         // Считаем ценности
@@ -342,7 +344,7 @@ export const useGameStore = create<GameState>()(
         for (const [good, count] of Object.entries(take)) {
           const goodId = good as GoodId;
           const currentBought = boughtItems[goodId] || 0;
-          if (currentBought + count > 2) return false; // Limit 2 per item
+          if (currentBought + count > 4) return false; // Limit 4 per item
           boughtItems[goodId] = currentBought + count;
         }
 
@@ -350,7 +352,7 @@ export const useGameStore = create<GameState>()(
         for (const [good, count] of Object.entries(give)) {
           const goodId = good as GoodId;
           const currentSold = soldItems[goodId] || 0;
-          if (currentSold + count > 2) return false; // Limit 2 per item
+          if (currentSold + count > 4) return false; // Limit 4 per item
           soldItems[goodId] = currentSold + count;
         }
 
