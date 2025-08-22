@@ -166,7 +166,7 @@ export const useGameStore = create<GameState>()(
       isBankrupt: () => {
         const { player, world } = get();
         const inv = player.inv;
-        
+
         // Проверяем, есть ли хоть что-то в инвентаре
         if (Object.keys(inv).length === 0 || Object.values(inv).every(count => count <= 0)) {
           return true;
@@ -182,15 +182,15 @@ export const useGameStore = create<GameState>()(
 
         // Проверяем новые условия банкротства
         const inventoryItems = Object.entries(inv).filter(([, count]) => count > 0);
-        
+
         // Если у игрока остался только 1 товар
         if (inventoryItems.length === 1) {
           const [goodId, count] = inventoryItems[0];
-          
+
           // Если это не еда и не вода, и у игрока только 1 единица
           if (goodId !== 'water' && goodId !== 'food' && count === 1) {
             const itemPrice = prices[goodId as GoodId];
-            
+
             // Если товар дешевый (стоимость 1) и еда/вода стоят больше 1
             if (itemPrice === 1 && waterPrice > 1 && foodPrice > 1) {
               return true; // Банкротство
