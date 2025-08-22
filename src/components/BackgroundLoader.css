@@ -1,0 +1,81 @@
+.background-loader {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.loader-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+.loader-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .background-loader {
+        top: 10px;
+        right: 10px;
+    }
+
+    .loader-indicator {
+        padding: 6px 10px;
+        gap: 8px;
+    }
+
+    .loader-spinner {
+        width: 14px;
+        height: 14px;
+        border-width: 1.5px;
+    }
+
+    .loader-text {
+        font-size: 0.8rem;
+    }
+}
