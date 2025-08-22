@@ -553,8 +553,8 @@ export const useGameStore = create<GameState>()(
 
       // Начать путешествие
       startTravel: (toCityId: string) => {
-        set({ 
-          isTraveling: true, 
+        set({
+          isTraveling: true,
           travelToCityId: toCityId,
           currentScreen: 'travel'
         });
@@ -566,8 +566,8 @@ export const useGameStore = create<GameState>()(
         if (travelToCityId) {
           // Выполняем фактическое путешествие
           get().travel(travelToCityId);
-          set({ 
-            isTraveling: false, 
+          set({
+            isTraveling: false,
             travelToCityId: null,
             currentScreen: 'city'
           });

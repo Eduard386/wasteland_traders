@@ -252,7 +252,7 @@ const CityScreen = () => {
   const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0 && tradeLimitsOk;
 
   return (
-    <div 
+    <div
       className="city-screen"
       style={{ opacity }}
     >
@@ -279,8 +279,8 @@ const CityScreen = () => {
               >
                 Map
               </button>
-              <button 
-                className="btn action-btn" 
+              <button
+                className="btn action-btn"
                 onClick={() => {
                   setOpacity(0);
                   setTimeout(() => {

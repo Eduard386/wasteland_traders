@@ -67,7 +67,7 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     // Если не хватает средств
     if (!canAfford) {
         return (
-            <div 
+            <div
                 className="guards-screen"
                 style={{ opacity }}
             >
@@ -84,8 +84,8 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                     <h1 className="guards-title">
                         Тебе нечем платить за наши услуги
                     </h1>
-                    <button 
-                        className="btn turn-back-btn" 
+                    <button
+                        className="btn turn-back-btn"
                         onClick={() => {
                             setOpacity(0);
                             setTimeout(() => {
@@ -154,7 +154,7 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     const paymentItems = calculatePaymentItems();
 
     return (
-        <div 
+        <div
             className="guards-screen"
             style={{ opacity }}
         >
@@ -187,8 +187,8 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                 </div>
 
                 <div className="guards-buttons-row">
-                    <button 
-                        className="btn agree-btn" 
+                    <button
+                        className="btn agree-btn"
                         onClick={() => {
                             setOpacity(0);
                             setTimeout(() => {
@@ -198,8 +198,8 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                     >
                         Agree
                     </button>
-                    <button 
-                        className="btn decline-btn" 
+                    <button
+                        className="btn decline-btn"
                         onClick={() => {
                             setOpacity(0);
                             setTimeout(() => {

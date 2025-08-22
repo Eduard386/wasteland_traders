@@ -13,7 +13,7 @@ const MapScreen = () => {
   useEffect(() => {
     // Сбрасываем выбранный город при открытии карты
     setSelectedCity(null);
-    
+
     // Fade in за 1 секунду
     const fadeInTimer = setTimeout(() => {
       setOpacity(1);
@@ -73,7 +73,7 @@ const MapScreen = () => {
   const handleTravel = () => {
     if (selectedCityId) {
       setIsFadingOut(true);
-      
+
       // Через 1 секунду начинаем путешествие
       setTimeout(() => {
         startTravel(selectedCityId);
@@ -99,7 +99,7 @@ const MapScreen = () => {
   const isSelected = (cityId: string) => cityId === selectedCityId;
 
   return (
-    <div 
+    <div
       className={`map-screen ${isFadingOut ? 'fade-out' : ''}`}
       style={{ opacity }}
     >
@@ -180,8 +180,8 @@ const MapScreen = () => {
 
           {/* Кнопки действий */}
           <div className="action-buttons">
-            <button 
-              className="btn return-btn" 
+            <button
+              className="btn return-btn"
               onClick={() => {
                 setOpacity(0);
                 setTimeout(() => {
