@@ -11,7 +11,7 @@ export const GOODS: Record<GoodId, string> = {
 };
 
 // Рынки (режимы города)
-export type MarketMode = "ALL2" | "ONE_CHEAP" | "ONE_EXP" | "CHEAP_EXP";
+export type MarketMode = "ALL2" | "ONE_CHEAP" | "TWO_CHEAP" | "ONE_EXP" | "CHEAP_EXP";
 
 export interface CityMarket {
   mode: MarketMode;

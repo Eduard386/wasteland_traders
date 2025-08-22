@@ -1,17 +1,22 @@
-import { useState } from 'react';
+
 import { useGameStore } from '../state/store';
 import { GOODS, type Road, type GoodId } from '../lib/types';
 import { getCityIcon, getGoodImage, getWorldMap } from '../utils/assets';
 import './MapScreen.css';
 
 const MapScreen = () => {
-  const { world, player, setScreen, travel } = useGameStore();
-  const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const { world, player, setScreen, travel, selectedCityId, setSelectedCity } = useGameStore();
 
   // Проверяем наличие ресурсов для действий
   const hasWater = (player.inv['water'] || 0) > 0;
   const hasFood = (player.inv['food'] || 0) > 0;
   const hasResources = hasWater || hasFood;
+
+  const handleHireGuards = () => {
+    if (selectedCityId) {
+      setScreen('guards');
+    }
+  };
 
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const neighbors = currentCity
@@ -40,7 +45,7 @@ const MapScreen = () => {
     // Проверяем, является ли город соседним
     const isNeighbor = neighbors.some(c => c.id === cityId);
     if (isNeighbor) {
-      setSelectedCityId(cityId);
+      setSelectedCity(cityId);
     }
     // Если не соседний - пока ничего не делаем
   };
@@ -48,7 +53,7 @@ const MapScreen = () => {
   const handleTravel = () => {
     if (selectedCityId) {
       travel(selectedCityId);
-      setSelectedCityId(null);
+      setSelectedCity(null);
     }
   };
 
@@ -136,7 +141,7 @@ const MapScreen = () => {
                   {/* Информация о маршруте для выбранного соседнего города */}
                   {isSelected(city.id) && route && (
                     <div className="route-info-popup">
-                      <div className="route-length">Length: {route.length}</div>
+                      <div className="route-length">Distance: {route.length}</div>
                       <div className="route-risk">Risk: {Math.round(route.risk * 100)}%</div>
                     </div>
                   )}
@@ -153,6 +158,7 @@ const MapScreen = () => {
             <button
               className={`btn guard-btn ${!hasResources ? 'disabled' : ''}`}
               disabled={!selectedCityId || !hasResources}
+              onClick={handleHireGuards}
             >
               Hire Guards
             </button>

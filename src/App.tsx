@@ -3,10 +3,11 @@ import { useGameStore } from './state/store';
 import CityScreen from './components/CityScreen';
 import MapScreen from './components/MapScreen';
 import BankruptcyScreen from './components/BankruptcyScreen';
+import GuardsScreen from './components/GuardsScreen';
 import './App.css';
 
 function App() {
-  const { world, initializeGame, currentScreen, isBankrupt } = useGameStore();
+  const { world, initializeGame, currentScreen, isBankrupt, selectedCityId } = useGameStore();
 
   // Инициализация игры при первом запуске
   useEffect(() => {
@@ -27,6 +28,22 @@ function App() {
         return <CityScreen />;
       case 'map':
         return <MapScreen />;
+      case 'guards':
+        return selectedCityId ? (
+          <GuardsScreen
+            targetCityId={selectedCityId}
+            onDecline={() => {
+              const { setScreen } = useGameStore.getState();
+              setScreen('map');
+            }}
+            onTurnBack={() => {
+              const { setScreen } = useGameStore.getState();
+              setScreen('map');
+            }}
+          />
+        ) : (
+          <MapScreen />
+        );
       default:
         return <CityScreen />;
     }

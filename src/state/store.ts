@@ -9,7 +9,8 @@ interface GameState {
   // Состояние
   world: World;
   player: Player;
-  currentScreen: 'city' | 'map';
+  currentScreen: 'city' | 'map' | 'guards';
+  selectedCityId: string | null;
 
   // Экшены
   canSpendResource: () => boolean;
@@ -19,15 +20,18 @@ interface GameState {
   proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   travel: (toCityId: string) => boolean;
-  setScreen: (screen: 'city' | 'map') => void;
+  travelWithGuards: (toCityId: string, paymentItems: Partial<Record<GoodId, number>>) => boolean;
+  setScreen: (screen: 'city' | 'map' | 'guards') => void;
+  setSelectedCity: (cityId: string | null) => void;
   initializeGame: (seed?: number) => void;
 }
 
-// Веса режимов рынков
+// Веса режимов рынков (равные вероятности)
 const MARKET_WEIGHTS: Record<MarketMode, number> = {
-  ALL2: 3,
-  ONE_CHEAP: 2,
-  ONE_EXP: 2,
+  ALL2: 0, // Убираем режим без изменений цен
+  ONE_CHEAP: 1,
+  TWO_CHEAP: 1,
+  ONE_EXP: 1,
   CHEAP_EXP: 1
 };
 
@@ -53,6 +57,12 @@ function generateMarketMode(rng: SeededRNG): CityMarket {
             mode,
             cheap: [rng.choice(['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'] as GoodId[])]
           };
+        case 'TWO_CHEAP': {
+          const goods: GoodId[] = ['water', 'food', 'fuel', 'ammo', 'scrap', 'medicine'];
+          const cheap1 = rng.choice(goods);
+          const cheap2 = rng.choice(goods.filter(g => g !== cheap1));
+          return { mode, cheap: [cheap1, cheap2] };
+        }
         case 'ONE_EXP':
           return {
             mode,
@@ -87,6 +97,7 @@ export const useGameStore = create<GameState>()(
         inv: {}
       },
       currentScreen: 'city',
+      selectedCityId: null,
 
       // Инициализация игры
       initializeGame: (seed?: number) => {
@@ -403,9 +414,102 @@ export const useGameStore = create<GameState>()(
         return true;
       },
 
+      // Путешествие с охраной
+      travelWithGuards: (toCityId: string, paymentItems: Partial<Record<GoodId, number>>) => {
+        const { world, player } = get();
+        const road = world.roads.find(r =>
+          (r.from === player.cityId && r.to === toCityId) ||
+          (r.from === toCityId && r.to === player.cityId)
+        );
+
+        if (!road) return false;
+
+        // Убираем товары для оплаты из инвентаря
+        // eslint-disable-next-line prefer-const
+        let newInv = { ...player.inv };
+        for (const [goodId, count] of Object.entries(paymentItems)) {
+          newInv[goodId as GoodId] = (newInv[goodId as GoodId] || 0) - count;
+          if ((newInv[goodId as GoodId] || 0) <= 0) {
+            delete newInv[goodId as GoodId];
+          }
+        }
+
+        // Потребление ресурсов за тик (как при обычном путешествии)
+        const hasWater = (newInv['water'] || 0) > 0;
+        const hasFood = (newInv['food'] || 0) > 0;
+
+        if (hasWater && hasFood) {
+          // Если есть и вода и еда, случайно потребляем одну
+          const rng = createRNG(world.seed, world.tick, 'resource');
+          if (rng.bool(0.5)) {
+            newInv['water'] = (newInv['water'] || 0) - 1;
+            if ((newInv['water'] || 0) <= 0) delete newInv['water'];
+          } else {
+            newInv['food'] = (newInv['food'] || 0) - 1;
+            if ((newInv['food'] || 0) <= 0) delete newInv['food'];
+          }
+        } else if (hasWater) {
+          // Если есть только вода, потребляем воду
+          newInv['water'] = (newInv['water'] || 0) - 1;
+          if ((newInv['water'] || 0) <= 0) delete newInv['water'];
+        } else if (hasFood) {
+          // Если есть только еда, потребляем еду
+          newInv['food'] = (newInv['food'] || 0) - 1;
+          if ((newInv['food'] || 0) <= 0) delete newInv['food'];
+        }
+
+        // Automatic tick on travel
+        const rng = createRNG(world.seed, world.tick + 1, 'tick');
+
+        const cityIds = world.cities.map(c => c.id);
+        const selectedCities: string[] = [];
+
+        for (let i = 0; i < 2; i++) {
+          const available = cityIds.filter(id => !selectedCities.includes(id));
+          if (available.length > 0) {
+            selectedCities.push(rng.choice(available));
+          }
+        }
+
+        const newCityStates = { ...world.cityStates };
+        selectedCities.forEach(cityId => {
+          newCityStates[cityId] = {
+            cityId,
+            market: generateMarketMode(rng),
+            updatedAtTick: world.tick + 1
+          };
+        });
+
+        set({
+          world: {
+            ...world,
+            tick: world.tick + 1,
+            cityStates: newCityStates
+          },
+          player: {
+            ...player,
+            inv: newInv,
+            cityId: toCityId,
+            tradeLimits: {
+              boughtItems: {},
+              soldItems: {},
+              lastCityId: toCityId
+            }
+          },
+          currentScreen: 'city'
+        });
+
+        return true;
+      },
+
       // Смена экрана
-      setScreen: (screen: 'city' | 'map') => {
+      setScreen: (screen: 'city' | 'map' | 'guards') => {
         set({ currentScreen: screen });
+      },
+
+      // Установка выбранного города
+      setSelectedCity: (cityId: string | null) => {
+        set({ selectedCityId: cityId });
       }
     }),
     {

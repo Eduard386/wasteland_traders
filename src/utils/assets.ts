@@ -29,3 +29,7 @@ export const getWorldMap = (): string => {
 export const getBankruptImage = (): string => {
   return getAssetPath('bankrupt.png');
 };
+
+export const getGuardsImage = (): string => {
+  return getAssetPath('guards.png');
+};
