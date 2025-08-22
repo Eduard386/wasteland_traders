@@ -1,7 +1,8 @@
 import { useGameStore } from '../state/store';
-import { getGuardsImage, getGoodImage } from '../utils/assets';
-import { GOODS, type GoodId } from '../lib/types';
+import { getGuardsImage } from '../utils/assets';
+import { type GoodId } from '../lib/types';
 import { getAllPrices } from '../lib/values';
+import GoodItem from './GoodItem';
 import './GuardsScreen.css';
 
 interface GuardsScreenProps {
@@ -62,14 +63,12 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                     backgroundRepeat: 'no-repeat'
                 }}
             >
-                <div className="guards-content">
-                    <h1 className="guards-title">
-                        Тебе нечем платить за наши услуги
-                    </h1>
-                    <button className="btn turn-back-btn" onClick={onTurnBack}>
-                        Turn back
-                    </button>
-                </div>
+                <h1 className="guards-title">
+                    Тебе нечем платить за наши услуги
+                </h1>
+                <button className="btn turn-back-btn" onClick={onTurnBack}>
+                    Turn back
+                </button>
             </div>
         );
     }
@@ -137,37 +136,33 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                 backgroundRepeat: 'no-repeat'
             }}
         >
-            <div className="guards-content">
-                <h1 className="guards-title">
-                    Мы готовы тебя сопровождать до {targetCity.name} за:
-                </h1>
+            <h1 className="guards-title">
+                This is the price for your safety
+            </h1>
 
-                <div className="payment-items">
-                    {Object.entries(paymentItems).map(([goodId, count]) => (
-                        <div key={goodId} className="payment-item">
-                            <img
-                                src={getGoodImage(goodId)}
-                                alt={GOODS[goodId as GoodId]}
-                                className="payment-item-image"
-                                onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                }}
-                            />
-                            <span className="payment-item-count">x{count}</span>
-                        </div>
-                    ))}
-                </div>
+            <div className="guards-payment-items">
+                {Object.entries(paymentItems).map(([goodId, count]) => (
+                    <GoodItem
+                        key={goodId}
+                        goodId={goodId as GoodId}
+                        count={count}
+                        price={prices[goodId as GoodId]}
+                        isMarket={false}
+                        isCheap={false}
+                        isExpensive={false}
+                    />
+                ))}
+            </div>
 
-                <div className="guards-buttons">
-                    <button className="btn agree-btn" onClick={() => {
-                        travelWithGuards(targetCityId, paymentItems);
-                    }}>
-                        Agree
-                    </button>
-                    <button className="btn decline-btn" onClick={onDecline}>
-                        Decline
-                    </button>
-                </div>
+            <div className="guards-buttons-row">
+                <button className="btn agree-btn" onClick={() => {
+                    travelWithGuards(targetCityId, paymentItems);
+                }}>
+                    Agree
+                </button>
+                <button className="btn decline-btn" onClick={onDecline}>
+                    Decline
+                </button>
             </div>
         </div>
     );
