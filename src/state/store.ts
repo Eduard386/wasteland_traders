@@ -287,7 +287,7 @@ export const useGameStore = create<GameState>()(
         return true;
       },
 
-            // Предложение сделки
+      // Предложение сделки
       proposeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => {
         const { world, player } = get();
         const currentCity = world.cityStates[player.cityId];
