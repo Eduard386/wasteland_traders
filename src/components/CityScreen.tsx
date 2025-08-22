@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameStore } from '../state/store';
 import GoodItem from './GoodItem';
 import type { GoodId } from '../lib/types';
@@ -11,6 +11,18 @@ const CityScreen = () => {
   const { world, player, doTick, setScreen, executeTrade } = useGameStore();
   const [giveItems, setGiveItems] = useState<Record<GoodId, number>>({} as Record<GoodId, number>);
   const [takeItems, setTakeItems] = useState<Record<GoodId, number>>({} as Record<GoodId, number>);
+  const [opacity, setOpacity] = useState(0);
+
+  useEffect(() => {
+    // Fade in за 1 секунду
+    const fadeInTimer = setTimeout(() => {
+      setOpacity(1);
+    }, 0);
+
+    return () => {
+      clearTimeout(fadeInTimer);
+    };
+  }, []);
 
   const currentCity = world.cities.find(c => c.id === player.cityId);
   const currentCityState = world.cityStates[player.cityId];
@@ -240,7 +252,10 @@ const CityScreen = () => {
   const isValidTrade = giveValue >= takeValue && Object.keys(giveItems).length > 0 && tradeLimitsOk;
 
   return (
-    <div className="city-screen">
+    <div 
+      className="city-screen"
+      style={{ opacity }}
+    >
       {/* Фон города */}
       <div
         className="city-background"
@@ -255,12 +270,26 @@ const CityScreen = () => {
             <div className="header-buttons">
               <button
                 className="btn action-btn"
-                onClick={() => setScreen('map')}
+                onClick={() => {
+                  setOpacity(0);
+                  setTimeout(() => {
+                    setScreen('map');
+                  }, 1000);
+                }}
               >
                 Map
               </button>
-              <button className="btn action-btn" onClick={doTick}>
-                Make Market Tick (2 cities)
+              <button 
+                className="btn action-btn" 
+                onClick={() => {
+                  setOpacity(0);
+                  setTimeout(() => {
+                    doTick();
+                    setOpacity(1);
+                  }, 1000);
+                }}
+              >
+                Wait (1 water or 1 food)
               </button>
               <button className="btn action-btn">
                 Copy Game Link

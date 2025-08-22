@@ -4,6 +4,7 @@ import CityScreen from './components/CityScreen';
 import MapScreen from './components/MapScreen';
 import BankruptcyScreen from './components/BankruptcyScreen';
 import GuardsScreen from './components/GuardsScreen';
+import TravelScreen from './components/TravelScreen';
 import './App.css';
 
 function App() {
@@ -43,6 +44,15 @@ function App() {
           />
         ) : (
           <MapScreen />
+        );
+      case 'travel':
+        return (
+          <TravelScreen
+            onComplete={() => {
+              const { completeTravel } = useGameStore.getState();
+              completeTravel();
+            }}
+          />
         );
       default:
         return <CityScreen />;

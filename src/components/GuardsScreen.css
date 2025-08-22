@@ -7,6 +7,7 @@
     color: #f8f9fa;
     z-index: 1000;
     overflow: hidden;
+    transition: opacity 1s ease-in-out;
 }
 
 .guards-video-background {

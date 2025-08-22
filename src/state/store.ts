@@ -9,8 +9,10 @@ interface GameState {
   // Состояние
   world: World;
   player: Player;
-  currentScreen: 'city' | 'map' | 'guards';
+  currentScreen: 'city' | 'map' | 'guards' | 'travel';
   selectedCityId: string | null;
+  isTraveling: boolean;
+  travelToCityId: string | null;
 
   // Экшены
   canSpendResource: () => boolean;
@@ -21,8 +23,10 @@ interface GameState {
   executeTrade: (give: Record<GoodId, number>, take: Record<GoodId, number>) => boolean;
   travel: (toCityId: string) => boolean;
   travelWithGuards: (toCityId: string, paymentItems: Partial<Record<GoodId, number>>) => boolean;
-  setScreen: (screen: 'city' | 'map' | 'guards') => void;
+  setScreen: (screen: 'city' | 'map' | 'guards' | 'travel') => void;
   setSelectedCity: (cityId: string | null) => void;
+  startTravel: (toCityId: string) => void;
+  completeTravel: () => void;
   initializeGame: (seed?: number) => void;
 }
 
@@ -98,6 +102,8 @@ export const useGameStore = create<GameState>()(
       },
       currentScreen: 'city',
       selectedCityId: null,
+      isTraveling: false,
+      travelToCityId: null,
 
       // Инициализация игры
       initializeGame: (seed?: number) => {
@@ -536,13 +542,36 @@ export const useGameStore = create<GameState>()(
       },
 
       // Смена экрана
-      setScreen: (screen: 'city' | 'map' | 'guards') => {
+      setScreen: (screen: 'city' | 'map' | 'guards' | 'travel') => {
         set({ currentScreen: screen });
       },
 
       // Установка выбранного города
       setSelectedCity: (cityId: string | null) => {
         set({ selectedCityId: cityId });
+      },
+
+      // Начать путешествие
+      startTravel: (toCityId: string) => {
+        set({ 
+          isTraveling: true, 
+          travelToCityId: toCityId,
+          currentScreen: 'travel'
+        });
+      },
+
+      // Завершить путешествие
+      completeTravel: () => {
+        const { travelToCityId } = get();
+        if (travelToCityId) {
+          // Выполняем фактическое путешествие
+          get().travel(travelToCityId);
+          set({ 
+            isTraveling: false, 
+            travelToCityId: null,
+            currentScreen: 'city'
+          });
+        }
       }
     }),
     {

@@ -1,11 +1,28 @@
 
+import { useState, useEffect } from 'react';
 import { useGameStore } from '../state/store';
 import { GOODS, type Road, type GoodId } from '../lib/types';
 import { getCityIcon, getGoodImage, getWorldMap } from '../utils/assets';
 import './MapScreen.css';
 
 const MapScreen = () => {
-  const { world, player, setScreen, travel, selectedCityId, setSelectedCity } = useGameStore();
+  const { world, player, setScreen, startTravel, selectedCityId, setSelectedCity } = useGameStore();
+  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+
+  useEffect(() => {
+    // Сбрасываем выбранный город при открытии карты
+    setSelectedCity(null);
+    
+    // Fade in за 1 секунду
+    const fadeInTimer = setTimeout(() => {
+      setOpacity(1);
+    }, 0);
+
+    return () => {
+      clearTimeout(fadeInTimer);
+    };
+  }, [setSelectedCity]);
 
   // Проверяем наличие ресурсов для действий
   const hasWater = (player.inv['water'] || 0) > 0;
@@ -14,7 +31,10 @@ const MapScreen = () => {
 
   const handleHireGuards = () => {
     if (selectedCityId) {
-      setScreen('guards');
+      setOpacity(0);
+      setTimeout(() => {
+        setScreen('guards');
+      }, 1000);
     }
   };
 
@@ -52,8 +72,13 @@ const MapScreen = () => {
 
   const handleTravel = () => {
     if (selectedCityId) {
-      travel(selectedCityId);
-      setSelectedCity(null);
+      setIsFadingOut(true);
+      
+      // Через 1 секунду начинаем путешествие
+      setTimeout(() => {
+        startTravel(selectedCityId);
+        setSelectedCity(null);
+      }, 1000);
     }
   };
 
@@ -74,7 +99,10 @@ const MapScreen = () => {
   const isSelected = (cityId: string) => cityId === selectedCityId;
 
   return (
-    <div className="map-screen">
+    <div 
+      className={`map-screen ${isFadingOut ? 'fade-out' : ''}`}
+      style={{ opacity }}
+    >
       <div
         className="map-background"
         style={{ backgroundImage: `url(${getWorldMap()})` }}
@@ -152,7 +180,15 @@ const MapScreen = () => {
 
           {/* Кнопки действий */}
           <div className="action-buttons">
-            <button className="btn return-btn" onClick={() => setScreen('city')}>
+            <button 
+              className="btn return-btn" 
+              onClick={() => {
+                setOpacity(0);
+                setTimeout(() => {
+                  setScreen('city');
+                }, 1000);
+              }}
+            >
               Return to City
             </button>
             <button

@@ -45,3 +45,8 @@ export const getGuardsVideo = (): string => {
   const version = 'v2';
   return getAssetPath(`guards.mp4?v=${version}`);
 };
+
+export const getTravelImage = (): string => {
+  const version = 'v2';
+  return getAssetPath(`travel.png?v=${version}`);
+};

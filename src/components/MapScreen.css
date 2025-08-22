@@ -4,6 +4,7 @@
     position: relative;
     overflow: hidden;
     color: #f8f9fa;
+    transition: opacity 1s ease-in-out;
 }
 
 .map-background {
@@ -28,6 +29,21 @@
     flex-direction: column;
     padding: 20px;
     box-sizing: border-box;
+}
+
+.map-screen.fade-out {
+    background-color: #000000 !important;
+    transition: background-color 1s ease-in-out;
+}
+
+.map-screen.fade-out .map-background {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.map-screen.fade-out .map-content {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
 }
 
 

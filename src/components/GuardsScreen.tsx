@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useGameStore } from '../state/store';
 import { getGuardsVideo } from '../utils/assets';
 import { type GoodId } from '../lib/types';
@@ -13,6 +14,18 @@ interface GuardsScreenProps {
 
 const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps) => {
     const { world, player, travelWithGuards } = useGameStore();
+    const [opacity, setOpacity] = useState(0);
+
+    useEffect(() => {
+        // Fade in за 1 секунду
+        const fadeInTimer = setTimeout(() => {
+            setOpacity(1);
+        }, 0);
+
+        return () => {
+            clearTimeout(fadeInTimer);
+        };
+    }, []);
 
     const targetCity = world.cities.find(c => c.id === targetCityId);
     const currentCityState = world.cityStates[player.cityId];
@@ -54,7 +67,10 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     // Если не хватает средств
     if (!canAfford) {
         return (
-            <div className="guards-screen">
+            <div 
+                className="guards-screen"
+                style={{ opacity }}
+            >
                 <video
                     className="guards-video-background"
                     autoPlay
@@ -68,7 +84,15 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                     <h1 className="guards-title">
                         Тебе нечем платить за наши услуги
                     </h1>
-                    <button className="btn turn-back-btn" onClick={onTurnBack}>
+                    <button 
+                        className="btn turn-back-btn" 
+                        onClick={() => {
+                            setOpacity(0);
+                            setTimeout(() => {
+                                onTurnBack();
+                            }, 1000);
+                        }}
+                    >
                         Turn back
                     </button>
                 </div>
@@ -130,7 +154,10 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     const paymentItems = calculatePaymentItems();
 
     return (
-        <div className="guards-screen">
+        <div 
+            className="guards-screen"
+            style={{ opacity }}
+        >
             <video
                 className="guards-video-background"
                 autoPlay
@@ -160,12 +187,26 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
                 </div>
 
                 <div className="guards-buttons-row">
-                    <button className="btn agree-btn" onClick={() => {
-                        travelWithGuards(targetCityId, paymentItems);
-                    }}>
+                    <button 
+                        className="btn agree-btn" 
+                        onClick={() => {
+                            setOpacity(0);
+                            setTimeout(() => {
+                                travelWithGuards(targetCityId, paymentItems);
+                            }, 1000);
+                        }}
+                    >
                         Agree
                     </button>
-                    <button className="btn decline-btn" onClick={onDecline}>
+                    <button 
+                        className="btn decline-btn" 
+                        onClick={() => {
+                            setOpacity(0);
+                            setTimeout(() => {
+                                onDecline();
+                            }, 1000);
+                        }}
+                    >
                         Decline
                     </button>
                 </div>
