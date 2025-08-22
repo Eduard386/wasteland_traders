@@ -33,3 +33,7 @@ export const getBankruptImage = (): string => {
 export const getGuardsImage = (): string => {
   return getAssetPath('guards.png');
 };
+
+export const getGuardsVideo = (): string => {
+  return getAssetPath('guards.mp4');
+};

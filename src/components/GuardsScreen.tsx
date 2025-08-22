@@ -1,5 +1,5 @@
 import { useGameStore } from '../state/store';
-import { getGuardsImage } from '../utils/assets';
+import { getGuardsVideo } from '../utils/assets';
 import { type GoodId } from '../lib/types';
 import { getAllPrices } from '../lib/values';
 import GoodItem from './GoodItem';
@@ -54,21 +54,24 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     // Если не хватает средств
     if (!canAfford) {
         return (
-            <div
-                className="guards-screen"
-                style={{
-                    backgroundImage: `url(${getGuardsImage()})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                }}
-            >
-                <h1 className="guards-title">
-                    Тебе нечем платить за наши услуги
-                </h1>
-                <button className="btn turn-back-btn" onClick={onTurnBack}>
-                    Turn back
-                </button>
+            <div className="guards-screen">
+                <video
+                    className="guards-video-background"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                >
+                    <source src={getGuardsVideo()} type="video/mp4" />
+                </video>
+                <div className="guards-content-overlay">
+                    <h1 className="guards-title">
+                        Тебе нечем платить за наши услуги
+                    </h1>
+                    <button className="btn turn-back-btn" onClick={onTurnBack}>
+                        Turn back
+                    </button>
+                </div>
             </div>
         );
     }
@@ -127,42 +130,45 @@ const GuardsScreen = ({ targetCityId, onDecline, onTurnBack }: GuardsScreenProps
     const paymentItems = calculatePaymentItems();
 
     return (
-        <div
-            className="guards-screen"
-            style={{
-                backgroundImage: `url(${getGuardsImage()})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-            }}
-        >
-            <h1 className="guards-title">
-                This is the price for your safety
-            </h1>
+        <div className="guards-screen">
+            <video
+                className="guards-video-background"
+                autoPlay
+                loop
+                muted
+                playsInline
+            >
+                <source src={getGuardsVideo()} type="video/mp4" />
+            </video>
+            <div className="guards-content-overlay">
+                <h1 className="guards-title">
+                    This is the price for your safety
+                </h1>
 
-            <div className="guards-payment-items">
-                {Object.entries(paymentItems).map(([goodId, count]) => (
-                    <GoodItem
-                        key={goodId}
-                        goodId={goodId as GoodId}
-                        count={count}
-                        price={prices[goodId as GoodId]}
-                        isMarket={false}
-                        isCheap={false}
-                        isExpensive={false}
-                    />
-                ))}
-            </div>
+                <div className="guards-payment-items">
+                    {Object.entries(paymentItems).map(([goodId, count]) => (
+                        <GoodItem
+                            key={goodId}
+                            goodId={goodId as GoodId}
+                            count={count}
+                            price={prices[goodId as GoodId]}
+                            isMarket={false}
+                            isCheap={false}
+                            isExpensive={false}
+                        />
+                    ))}
+                </div>
 
-            <div className="guards-buttons-row">
-                <button className="btn agree-btn" onClick={() => {
-                    travelWithGuards(targetCityId, paymentItems);
-                }}>
-                    Agree
-                </button>
-                <button className="btn decline-btn" onClick={onDecline}>
-                    Decline
-                </button>
+                <div className="guards-buttons-row">
+                    <button className="btn agree-btn" onClick={() => {
+                        travelWithGuards(targetCityId, paymentItems);
+                    }}>
+                        Agree
+                    </button>
+                    <button className="btn decline-btn" onClick={onDecline}>
+                        Decline
+                    </button>
+                </div>
             </div>
         </div>
     );
