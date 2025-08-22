@@ -581,12 +581,12 @@ export const useGameStore = create<GameState>()(
             const currentCityState = world.cityStates[player.cityId];
             if (currentCityState) {
               const prices = getAllPrices(currentCityState.market);
-              
+
               // Рассчитываем общую стоимость инвентаря (за вычетом потраченной еды/воды)
               const invAfterTravel = { ...player.inv };
               const hasWater = (invAfterTravel['water'] || 0) > 0;
               const hasFood = (invAfterTravel['food'] || 0) > 0;
-              
+
               if (hasWater && hasFood) {
                 // Случайно выбираем что потратить
                 if (rng.next() < 0.5) {
@@ -631,12 +631,12 @@ export const useGameStore = create<GameState>()(
 
                   const remainingValue = stolenValue - currentStolenValue;
                   let maxItemsNeeded = Math.floor(remainingValue / item.price);
-                  
+
                   // Если у игрока всего 1 товар и нужно украсть что-то, берем этот товар
                   if (sortedItems.length === 1 && item.count === 1 && maxItemsNeeded === 0) {
                     maxItemsNeeded = 1;
                   }
-                  
+
                   const itemsToTake = Math.min(maxItemsNeeded, item.count);
 
                   if (itemsToTake > 0) {
@@ -700,7 +700,7 @@ export const useGameStore = create<GameState>()(
       // Завершить ограбление
       completeRobbery: () => {
         const { robbedItems, player, world, robberyTargetCityId } = get();
-        
+
         // Удаляем украденные товары из инвентаря
         const newInv = { ...player.inv };
         Object.entries(robbedItems).forEach(([goodId, count]) => {
@@ -719,7 +719,7 @@ export const useGameStore = create<GameState>()(
         // Выполняем фактическое путешествие (тратим ресурсы и перемещаемся)
         const hasWater = (newInv['water'] || 0) > 0;
         const hasFood = (newInv['food'] || 0) > 0;
-        
+
         // Тратим ресурсы на путешествие
         if (hasWater && hasFood) {
           // Случайно выбираем что потратить
@@ -740,8 +740,8 @@ export const useGameStore = create<GameState>()(
         }
 
         // Проверяем банкротство после ограбления
-        const updatedPlayer = { 
-          ...player, 
+        const updatedPlayer = {
+          ...player,
           inv: newInv,
           cityId: targetCityId, // Перемещаем в целевой город
           tradeLimits: {
@@ -750,7 +750,7 @@ export const useGameStore = create<GameState>()(
             lastCityId: targetCityId
           }
         };
-        
+
         // Проверяем, есть ли хоть что-то в инвентаре
         if (Object.keys(newInv).length === 0 || Object.values(newInv).every(count => count <= 0)) {
           // Банкротство - показываем экран банкротства
@@ -778,12 +778,12 @@ export const useGameStore = create<GameState>()(
           // Если у игрока остался только 1 товар, и он дешевый (стоимость 1)
           // и при этом цена воды больше 1, и цена еды больше 1
           const remainingItems = Object.entries(newInv).filter(([, count]) => count > 0);
-          
+
           if (remainingItems.length === 1) {
             const [onlyGoodId, onlyCount] = remainingItems[0];
             const onlyGood = onlyGoodId as GoodId;
             const onlyGoodPrice = prices[onlyGood];
-            
+
             if (onlyCount === 1 && onlyGoodPrice === 1 && waterPrice > 1 && foodPrice > 1) {
               // Банкротство - показываем экран банкротства
               set({
@@ -801,9 +801,9 @@ export const useGameStore = create<GameState>()(
           // и он не может купить воду или еду (стоимость больше 1)
           if (remainingItems.length === 1) {
             const [, onlyCount] = remainingItems[0];
-            
+
             console.log('completeRobbery - checking bankruptcy: onlyCount =', onlyCount, 'waterPrice =', waterPrice, 'foodPrice =', foodPrice);
-            
+
             // Если у игрока только 1 товар и он не может купить воду или еду
             if (onlyCount === 1 && waterPrice > 1 && foodPrice > 1) {
               console.log('completeRobbery - BANKRUPTCY DETECTED!');
