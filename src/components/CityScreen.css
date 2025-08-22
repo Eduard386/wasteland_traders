@@ -25,7 +25,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .city-header {
@@ -79,9 +79,24 @@
 }
 
 /* Стили для бартера */
-.market-section,
-.inventory-section {
+.market-section {
   margin: 10px 0;
+}
+
+.inventory-section {
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  z-index: 10;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 120px;
+  height: 120px;
 }
 
 .market-section h3,
@@ -93,26 +108,25 @@
 
 /* Специальные стили для инвентаря */
 .inventory-section .items-row {
-  background: rgba(0, 0, 0, 0.3);
-  width: fit-content;
-  min-width: 150px;
-}
-
-/* Специальные стили для инвентаря */
-.inventory-section .items-row {
-  background: rgba(0, 0, 0, 0.3);
-  width: fit-content;
-  min-width: 150px;
+  min-height: 140px !important;
+  height: auto !important;
+  width: fit-content !important;
+  min-width: 150px !important;
+  padding: 20px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
 }
 
 .items-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
+  gap: 15px;
+  padding: 20px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
-  min-height: 100px;
+  min-height: 140px;
   justify-content: center;
   align-items: center;
   width: fit-content;
